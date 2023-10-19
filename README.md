@@ -2,6 +2,7 @@
 Yazlab - 1 Shared Repo
 
 Yapılacaklar:
+
 1-Veritabanı bağlantısı
 
 2-Yönetici paneli
