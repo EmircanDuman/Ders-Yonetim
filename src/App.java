@@ -312,7 +312,6 @@ public class App extends JFrame implements ActionListener, KeyListener {
       OgretmenGirisEkrani();
     }
     if(e.getSource()==ogrenciGirisButonu){
-      System.out.println("test");
       OgrenciGirisEkrani();
     }
     if(e.getSource()==anaGirisEkraniDon){
