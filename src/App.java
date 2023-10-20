@@ -32,12 +32,18 @@ public class App extends JFrame implements ActionListener, KeyListener {
   JButton ogretmenGirisButonu;
   JButton ogrenciGirisButonu;
   JButton anaGirisEkraniDon;
+
   JTextField yoneticiGirisSifreTextField;
   JTextField ogretmenGirisIsimTextField;
   JTextField ogretmenGirisSifreTextField;
   JTextField ogrenciGirisIsimTextField;
   JTextField ogrenciGirisSifreTextField;
 
+  JLabel yoneticiGirisLabel;
+  JLabel ogretmenGirisIsimLabel;
+  JLabel ogretmenGirisSifreLabel;
+  JLabel ogrenciGirisIsimLabel;
+  JLabel ogrenciGirisSifreLabel;
 
   Color primary;
   Font mainFont;
@@ -199,6 +205,14 @@ public class App extends JFrame implements ActionListener, KeyListener {
     return textField;
   }
 
+  JLabel StandartGirisPaneliLabel(String text, int x, int y){
+    JLabel label = new JLabel();
+    label.setFont(mainFont);
+    label.setText(text);
+    label.setBounds(x, y, 500, 50);
+    return label;
+  }
+
   void GUIAtama(){
     panel = new JPanel();
     primary = new Color(147, 191, 207);
@@ -214,6 +228,12 @@ public class App extends JFrame implements ActionListener, KeyListener {
     ogretmenGirisSifreTextField = StandartGirisPaneliTextField(500, 350);
     ogrenciGirisIsimTextField = StandartGirisPaneliTextField(500, 250);
     ogrenciGirisSifreTextField = StandartGirisPaneliTextField(500, 350);
+
+    yoneticiGirisLabel = StandartGirisPaneliLabel("Yonetici sifresi giriniz:", 475, 300);
+    ogretmenGirisIsimLabel = StandartGirisPaneliLabel("Ogretmen ismi ve soyismi giriniz:", 425, 200);
+    ogretmenGirisSifreLabel = StandartGirisPaneliLabel("Ogretmen sifresi giriniz:", 475, 300);
+    ogrenciGirisIsimLabel = StandartGirisPaneliLabel("Ogrenci ismi ve soyismi giriniz:", 425, 200);
+    ogrenciGirisSifreLabel = StandartGirisPaneliLabel("Ogrenci sifresi giriniz:", 475, 300);
 
     panel.setLayout(null);
     this.add(panel);
@@ -235,6 +255,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
   panel.removeAll();
   panel.add(yoneticiGirisSifreTextField);
   panel.add(anaGirisEkraniDon);
+  panel.add(yoneticiGirisLabel);
   panel.repaint();
   }
 
@@ -243,6 +264,8 @@ public class App extends JFrame implements ActionListener, KeyListener {
   panel.add(ogretmenGirisIsimTextField);
   panel.add(ogretmenGirisSifreTextField);
   panel.add(anaGirisEkraniDon);
+  panel.add(ogretmenGirisIsimLabel);
+  panel.add(ogretmenGirisSifreLabel);
   panel.repaint();
   }
 
@@ -251,7 +274,9 @@ public class App extends JFrame implements ActionListener, KeyListener {
   panel.add(ogrenciGirisIsimTextField);
   panel.add(ogrenciGirisSifreTextField);
   panel.add(anaGirisEkraniDon);
-  panel.removeAll();
+  panel.add(ogrenciGirisIsimLabel);
+  panel.add(ogrenciGirisSifreLabel);
+  panel.repaint();
   }
 
   //--------------UI Bileşenlerini Panele Doldurma Alani Sonu
@@ -287,7 +312,8 @@ public class App extends JFrame implements ActionListener, KeyListener {
       OgretmenGirisEkrani();
     }
     if(e.getSource()==ogrenciGirisButonu){
-      OgretmenGirisEkrani();
+      System.out.println("test");
+      OgrenciGirisEkrani();
     }
     if(e.getSource()==anaGirisEkraniDon){
       GirisEkrani();
