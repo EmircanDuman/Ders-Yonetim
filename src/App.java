@@ -30,6 +30,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
   static String connectionURL = "jdbc:postgresql://localhost:5432/yazlab1?user=postgres&password=0000";
 
   JPanel panel;
+  Connection connection;
 
   JButton yoneticiGirisEkraniButonu;
   JButton ogretmenGirisEkraniButonu;
@@ -188,6 +189,14 @@ public class App extends JFrame implements ActionListener, KeyListener {
 
   //---------------------------------------------GUI BÖLGESİ BAŞLANGICI
 
+  void TextFieldTemizle(){
+    yoneticiGirisSifreTextField.setText("");
+    ogretmenGirisIsimTextField.setText("");
+    ogretmenGirisSifreTextField.setText("");
+    ogrenciGirisIsimTextField.setText("");
+    ogrenciGirisSifreTextField.setText("");
+  }
+
   JButton StandartGirisPaneliButonu(String baslik, int x, int y){
     JButton btn = new JButton(baslik);
     btn.setSize(300, 60);
@@ -253,16 +262,30 @@ public class App extends JFrame implements ActionListener, KeyListener {
 
   //--------------UI Bileşenlerini Panele Doldurma
 
-  void GirisEkrani(){
+  void GirisEkrani() {
     panel.removeAll();
+    TextFieldTemizle();
     panel.add(yoneticiGirisEkraniButonu);
     panel.add(ogretmenGirisEkraniButonu);
     panel.add(ogrenciGirisEkraniButonu);
     panel.repaint();
+
+  /*
+    try {
+      while (resultSet.next()) {
+        for (int i = 1; i <= metaData.getColumnCount(); i++) {
+          System.out.println(resultSet.getString(metaData.getColumnLabel(i));
+        }
+      }
+    } catch (SQLException e) {
+        throw new RuntimeException(e);
+    }
+  */
   }
 
   void YoneticiGirisEkrani(){
   panel.removeAll();
+  TextFieldTemizle();
   panel.add(yoneticiGirisSifreTextField);
   panel.add(anaGirisEkraniDon);
   panel.add(yoneticiGirisLabel);
@@ -272,6 +295,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
 
   void OgretmenGirisEkrani(){
   panel.removeAll();
+  TextFieldTemizle();
   panel.add(ogretmenGirisIsimTextField);
   panel.add(ogretmenGirisSifreTextField);
   panel.add(anaGirisEkraniDon);
@@ -283,6 +307,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
 
   void OgrenciGirisEkrani(){
   panel.removeAll();
+  TextFieldTemizle();
   panel.add(ogrenciGirisIsimTextField);
   panel.add(ogrenciGirisSifreTextField);
   panel.add(anaGirisEkraniDon);
@@ -299,6 +324,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
 
 
   App(Connection connection){
+    this.connection = connection;
     this.setTitle("Ders Talep Sistemi");
     this.setSize(1200, 800);
     this.setResizable(false);
@@ -309,7 +335,6 @@ public class App extends JFrame implements ActionListener, KeyListener {
   }
 
   public static void main(String[] args) {
-
     try {
       new App(DriverManager.getConnection(connectionURL));
     } catch (SQLException e) {
