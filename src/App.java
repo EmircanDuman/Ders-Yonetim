@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.*;
 
 /*
 * PROJE ÖNCÜLLERİ:
@@ -26,12 +27,17 @@ public class App extends JFrame implements ActionListener, KeyListener {
   * ana JFrame'de görülür.
   * */
 
+  static String connectionURL = "jdbc:postgresql://localhost:5432/yazlab1?user=postgres&password=0000";
+
   JPanel panel;
 
-  JButton yoneticiGirisButonu;
-  JButton ogretmenGirisButonu;
-  JButton ogrenciGirisButonu;
+  JButton yoneticiGirisEkraniButonu;
+  JButton ogretmenGirisEkraniButonu;
+  JButton ogrenciGirisEkraniButonu;
   JButton anaGirisEkraniDon;
+  JButton yoneticiLoginButonu;
+  JButton ogretmenLoginButonu;
+  JButton ogrenciLoginButonu;
 
   JTextField yoneticiGirisSifreTextField;
   JTextField ogretmenGirisIsimTextField;
@@ -218,10 +224,14 @@ public class App extends JFrame implements ActionListener, KeyListener {
     primary = new Color(147, 191, 207);
     mainFont = new Font("TimesRoman", Font.BOLD, 24);
 
-    yoneticiGirisButonu = StandartGirisPaneliButonu("Yonetici Girisi", 450, 120);
-    ogretmenGirisButonu = StandartGirisPaneliButonu("Ogretmen Girisi", 450, 330);
-    ogrenciGirisButonu = StandartGirisPaneliButonu("Ogrenci Girisi", 450, 540);
+    yoneticiGirisEkraniButonu = StandartGirisPaneliButonu("Yonetici Girisi", 450, 120);
+    ogretmenGirisEkraniButonu = StandartGirisPaneliButonu("Ogretmen Girisi", 450, 330);
+    ogrenciGirisEkraniButonu = StandartGirisPaneliButonu("Ogrenci Girisi", 450, 540);
     anaGirisEkraniDon = StandartGirisPaneliButonu("Geri don", 450, 680);
+
+    yoneticiLoginButonu = StandartGirisPaneliButonu("Yonetici Olarak Gir", 450, 425);
+    ogretmenLoginButonu = StandartGirisPaneliButonu("Ogretmen Olarak Gir", 450, 425);
+    ogrenciLoginButonu = StandartGirisPaneliButonu("Ogrenci Olarak Gir", 450, 425);
 
     yoneticiGirisSifreTextField = StandartGirisPaneliTextField(500, 350);
     ogretmenGirisIsimTextField = StandartGirisPaneliTextField(500, 250);
@@ -245,9 +255,9 @@ public class App extends JFrame implements ActionListener, KeyListener {
 
   void GirisEkrani(){
     panel.removeAll();
-    panel.add(yoneticiGirisButonu);
-    panel.add(ogretmenGirisButonu);
-    panel.add(ogrenciGirisButonu);
+    panel.add(yoneticiGirisEkraniButonu);
+    panel.add(ogretmenGirisEkraniButonu);
+    panel.add(ogrenciGirisEkraniButonu);
     panel.repaint();
   }
 
@@ -256,6 +266,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
   panel.add(yoneticiGirisSifreTextField);
   panel.add(anaGirisEkraniDon);
   panel.add(yoneticiGirisLabel);
+  panel.add(yoneticiLoginButonu);
   panel.repaint();
   }
 
@@ -266,6 +277,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
   panel.add(anaGirisEkraniDon);
   panel.add(ogretmenGirisIsimLabel);
   panel.add(ogretmenGirisSifreLabel);
+  panel.add(ogretmenLoginButonu);
   panel.repaint();
   }
 
@@ -276,6 +288,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
   panel.add(anaGirisEkraniDon);
   panel.add(ogrenciGirisIsimLabel);
   panel.add(ogrenciGirisSifreLabel);
+  panel.add(ogrenciLoginButonu);
   panel.repaint();
   }
 
@@ -285,7 +298,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
 
 
 
-  App(){
+  App(Connection connection){
     this.setTitle("Ders Talep Sistemi");
     this.setSize(1200, 800);
     this.setResizable(false);
@@ -296,7 +309,13 @@ public class App extends JFrame implements ActionListener, KeyListener {
   }
 
   public static void main(String[] args) {
-    new App();
+
+    try {
+      new App(DriverManager.getConnection(connectionURL));
+    } catch (SQLException e) {
+      System.err.println("Bağlantı hatası.");
+      e.printStackTrace();
+    }
   }
 
 
@@ -305,13 +324,13 @@ public class App extends JFrame implements ActionListener, KeyListener {
 
   @Override
   public void actionPerformed(ActionEvent e) {
-    if(e.getSource()==yoneticiGirisButonu){
+    if(e.getSource()== yoneticiGirisEkraniButonu){
       YoneticiGirisEkrani();
     }
-    if(e.getSource()==ogretmenGirisButonu){
+    if(e.getSource()== ogretmenGirisEkraniButonu){
       OgretmenGirisEkrani();
     }
-    if(e.getSource()==ogrenciGirisButonu){
+    if(e.getSource()== ogrenciGirisEkraniButonu){
       OgrenciGirisEkrani();
     }
     if(e.getSource()==anaGirisEkraniDon){
