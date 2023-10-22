@@ -5,12 +5,10 @@ import java.sql.*;
 
 /*
 * PROJE ÖNCÜLLERİ:
-*
 * PostgreSQL veritabanı paylaş
 * Java Database Connector kütüphanesi kur
 * GitHub collaboration
 * Dbdiagram.io linki: https://dbdiagram.io/d/Yazlab-1-Database-Dizayni-652bc0f7ffbf5169f0b4f317
-*
 * */
 
 
@@ -360,6 +358,26 @@ public class App extends JFrame implements ActionListener, KeyListener {
     }
     if(e.getSource()==anaGirisEkraniDon){
       GirisEkrani();
+    }
+
+    if(e.getSource()==yoneticiLoginButonu){
+      try {
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT admin_sifresi FROM parametreler WHERE id = 1");
+        if (resultSet.next()){
+          if (resultSet.getString("admin_sifresi").equals(yoneticiGirisSifreTextField.getText())){
+            System.out.println("basarili");
+          }
+          else {
+            System.out.println("sifre yanlis");
+          }
+        }
+        else System.out.println("sifre yok zaten");
+
+      } catch (SQLException ex) {
+        throw new RuntimeException(ex);
+      }
+
     }
   }
 
