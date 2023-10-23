@@ -315,6 +315,15 @@ public class App extends JFrame implements ActionListener, KeyListener {
   panel.repaint();
   }
 
+  void OgrenciEkrani(Ogrenci ogrenci){
+    panel.removeAll();
+    //
+
+    //
+
+    panel.repaint();
+  }
+
   //--------------UI Bileşenlerini Panele Doldurma Alani Sonu
 
   //---------------------------------------------GUI BÖLGESİ SONU
@@ -372,7 +381,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
             System.out.println("sifre yanlis");
           }
         }
-        else System.out.println("sifre yok zaten");
+        else System.out.println("kayit yok");
 
       } catch (SQLException ex) {
         throw new RuntimeException(ex);
