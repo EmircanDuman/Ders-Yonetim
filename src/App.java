@@ -11,6 +11,8 @@ import java.sql.*;
 * Dbdiagram.io linki: https://dbdiagram.io/d/Yazlab-1-Database-Dizayni-652bc0f7ffbf5169f0b4f317
 * */
 
+// KENDİ ÖĞRENCİ TRANSKRİPTİN İLE YAPMAN LAZIM
+
 
 public class App extends JFrame implements ActionListener, KeyListener {
 
@@ -65,6 +67,15 @@ public class App extends JFrame implements ActionListener, KeyListener {
     private String sifre;
     private String[] ilgiAlanlari;
     private Float genelNot;
+
+    public Ogrenci(Integer no, String ad, String soyad, String sifre, String[] ilgiAlanlari, Float genelNot) {
+      this.no = no;
+      this.ad = ad;
+      this.soyad = soyad;
+      this.sifre = sifre;
+      this.ilgiAlanlari = ilgiAlanlari;
+      this.genelNot = genelNot;
+    }
 
     public Integer getNo() {
       return no;
@@ -124,6 +135,16 @@ public class App extends JFrame implements ActionListener, KeyListener {
     private String[] ilgiAlanlari;
     private Integer kontenjanSayisi;
     private String[] acilanDersler;
+
+    public Ogretmen(Integer sicilNo, String ad, String soyad, String sifre, String[] ilgiAlanlari, Integer kontenjanSayisi, String[] acilanDersler) {
+      this.sicilNo = sicilNo;
+      this.ad = ad;
+      this.soyad = soyad;
+      this.sifre = sifre;
+      this.ilgiAlanlari = ilgiAlanlari;
+      this.kontenjanSayisi = kontenjanSayisi;
+      this.acilanDersler = acilanDersler;
+    }
 
     public Integer getSicilNo() {
       return sicilNo;
