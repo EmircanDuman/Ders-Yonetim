@@ -26,7 +26,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
   * Ana JFrame'e bir panel JPanel'i eklenir.
   * Oluşturulan bu bileşenler farklı fonksiyonlarla panel'e doldurulur.
   * Ve panelde yapılan değişiklikler repaint() fonksiyonu ile panel yenilenerek
-  * ana JFrame'de görülür.
+  * ana JFrame'de görülür. test
   * */
 
   static String connectionURL = "jdbc:postgresql://localhost:5432/yazlab1?user=postgres&password=0000";
