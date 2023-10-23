@@ -11,6 +11,8 @@ import java.sql.*;
 * Dbdiagram.io linki: https://dbdiagram.io/d/Yazlab-1-Database-Dizayni-652bc0f7ffbf5169f0b4f317
 * */
 
+//text
+
 // KENDİ ÖĞRENCİ TRANSKRİPTİN İLE YAPMAN LAZIM
 
 
