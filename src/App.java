@@ -351,8 +351,6 @@ public class App extends JFrame implements ActionListener, KeyListener {
 
   //---------------------------------------------GUI BÖLGESİ SONU
 
-
-
   App(Connection connection){
     this.connection = connection;
     this.setTitle("Ders Talep Sistemi");
@@ -372,8 +370,6 @@ public class App extends JFrame implements ActionListener, KeyListener {
       e.printStackTrace();
     }
   }
-
-
 
   //---------------------------------------------GİRDİ FONKSİYONLARI BAŞLANGIÇI
 
@@ -412,56 +408,49 @@ public class App extends JFrame implements ActionListener, KeyListener {
     }
     if (e.getSource() == ogretmenLoginButonu) {
       try {
-        String kullaniciAdi1 = ogretmenGirisIsimTextField.getText();
-        String sifre1 = ogretmenGirisSifreTextField.getText();
-        String[] adSoyad1=kullaniciAdi1.split(" ");
-        String ad1=adSoyad1[0];
+        String[] adSoyadArray = ogretmenGirisIsimTextField.getText().trim().split("\\s+");
+        if(adSoyadArray.length != 2){
+          JOptionPane.showMessageDialog(this, "Lutfen dogru formatta girin");
+          return;
+        }
+        PreparedStatement dogrulaStatement = connection.prepareStatement("SELECT * FROM hocalar WHERE ad = ? AND soyad = ? AND sifre= ?");
+        dogrulaStatement.setString(1, adSoyadArray[0]);
+        dogrulaStatement.setString(2, adSoyadArray[1]);
+        dogrulaStatement.setString(3, ogretmenGirisSifreTextField.getText().trim());
 
-        String dogrulaSorgusu = "SELECT * FROM hocalar WHERE ad = ? AND  sifre=?";
-        PreparedStatement dogrulaStatement = connection.prepareStatement(dogrulaSorgusu);
-        dogrulaStatement.setString(1, ad1);
+        ResultSet resultSet = dogrulaStatement.executeQuery();
 
-        dogrulaStatement.setString(2, sifre1);
-
-        ResultSet sonuc1 = dogrulaStatement.executeQuery();
-
-        if (sonuc1.next()) {
+        if (resultSet.next()) {
           System.out.println("Giriş başarılı.");
-          JOptionPane.showMessageDialog(this,"Giriş Başarılı");
         } else {
           System.out.println("Giriş başarısız.");
-          JOptionPane.showMessageDialog(this,"Giriş Başarısız");
         }
+
       } catch (SQLException ex) {
-        throw new RuntimeException(ex);
-      }
+          throw new RuntimeException(ex);
         }
+      }
     if (e.getSource() == ogrenciLoginButonu) {
       try {
-        String kullaniciAdi = ogrenciGirisIsimTextField.getText();
-        String sifre = ogrenciGirisSifreTextField.getText();
-        String[] adsoyad=kullaniciAdi.split(" ");
-        String ad=adsoyad[0];
+        String[] adSoyadArray = ogretmenGirisIsimTextField.getText().trim().split("\\s+");
+        if(adSoyadArray.length != 2){
+          JOptionPane.showMessageDialog(this, "Lutfen dogru formatta girin");
+          return;
+        }
+        PreparedStatement dogrulaStatement = connection.prepareStatement("SELECT * FROM ogrenciler WHERE ad = ? AND soyad = ? AND sifre= ?");
+        dogrulaStatement.setString(1, adSoyadArray[0]);
+        dogrulaStatement.setString(2, adSoyadArray[1]);
+        ResultSet resultSet = dogrulaStatement.executeQuery();
 
-        String dogrulaSorgusu = "SELECT * FROM ogrenciler WHERE ad = ? AND sifre = ?";
-        PreparedStatement dogrulaStatement = connection.prepareStatement(dogrulaSorgusu);
-        dogrulaStatement.setString(1, ad);
-        dogrulaStatement.setString(2, sifre);
-
-        ResultSet sonuc = dogrulaStatement.executeQuery();
-
-        if (sonuc.next()) {
+        if (resultSet.next()) {
           System.out.println("Giriş başarılı.");
-          JOptionPane.showMessageDialog(this,"Giriş Başarılı");
 
         } else {
           System.out.println("Giriş başarısız.");
-          JOptionPane.showMessageDialog(this,"Giriş Başarısız");
-          System.out.println(kullaniciAdi);
         }
       } catch (SQLException ex) {
-        throw new RuntimeException(ex);
-      }
+          throw new RuntimeException(ex);
+        }
       }
   }
 
