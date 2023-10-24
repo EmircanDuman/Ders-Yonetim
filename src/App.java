@@ -3,31 +3,12 @@ import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
 
-/*
-* PROJE ÖNCÜLLERİ:
-* PostgreSQL veritabanı paylaş
-* Java Database Connector kütüphanesi kur
-* GitHub collaboration
-* Dbdiagram.io linki: https://dbdiagram.io/d/Yazlab-1-Database-Dizayni-652bc0f7ffbf5169f0b4f317
-* */
-
-//text
-
 // KENDİ ÖĞRENCİ TRANSKRİPTİN İLE YAPMAN LAZIM
 
 
 public class App extends JFrame implements ActionListener, KeyListener {
 
   //---------------------------------------------UI BİLEŞENLERİ TANIMLAMA ALANI
-
-  /*
-  * Çalışma mantığı: Aplikasyonda kullanılacak tüm UI bileşenleri burada tanımlanır. Daha sonra
-  * tanımlanan bu bileşenler GUIAtama() fonksiyonu içerisinde oluşturulur.
-  * Ana JFrame'e bir panel JPanel'i eklenir.
-  * Oluşturulan bu bileşenler farklı fonksiyonlarla panel'e doldurulur.
-  * Ve panelde yapılan değişiklikler repaint() fonksiyonu ile panel yenilenerek
-  * ana JFrame'de görülür. test
-  * */
 
   static String connectionURL = "jdbc:postgresql://localhost:5432/yazlab1?user=postgres&password=0000";
 
@@ -57,9 +38,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
   Color primary;
   Font mainFont;
 
-  //---------------------------------------------UI BİLEŞENLERİ TANIMLAMA ALANI SONU
-
-
+  //---------------------------------------------UI BİLEŞENLERİ TANIMLAMA ALANI SON
 
   //---------------------------------------------PRIVATE CLASS ALANI SONU
   private class Ogrenci{
@@ -206,8 +185,6 @@ public class App extends JFrame implements ActionListener, KeyListener {
   }
   //---------------------------------------------PRIVATE CLASS TANIMLAMA ALANI SONU
 
-
-
   //---------------------------------------------GUI BÖLGESİ BAŞLANGICI
 
   void TextFieldTemizle(){
@@ -290,18 +267,6 @@ public class App extends JFrame implements ActionListener, KeyListener {
     panel.add(ogretmenGirisEkraniButonu);
     panel.add(ogrenciGirisEkraniButonu);
     panel.repaint();
-
-  /*
-    try {
-      while (resultSet.next()) {
-        for (int i = 1; i <= metaData.getColumnCount(); i++) {
-          System.out.println(resultSet.getString(metaData.getColumnLabel(i));
-        }
-      }
-    } catch (SQLException e) {
-        throw new RuntimeException(e);
-    }
-  */
   }
 
   void YoneticiGirisEkrani(){
@@ -338,13 +303,16 @@ public class App extends JFrame implements ActionListener, KeyListener {
   panel.repaint();
   }
 
+  void YoneticiEkrani(){
+
+  }
+
+  void OgretmenEkrani(Ogretmen ogretmen){
+
+  }
+
   void OgrenciEkrani(Ogrenci ogrenci){
-    panel.removeAll();
-    //
 
-    //
-
-    panel.repaint();
   }
 
   //--------------UI Bileşenlerini Panele Doldurma Alani Sonu
@@ -402,6 +370,8 @@ public class App extends JFrame implements ActionListener, KeyListener {
         }
         else System.out.println("kayit yok");
 
+        statement.close();
+        resultSet.close();
       } catch (SQLException ex) {
         throw new RuntimeException(ex);
       }
@@ -413,37 +383,44 @@ public class App extends JFrame implements ActionListener, KeyListener {
           JOptionPane.showMessageDialog(this, "Lutfen dogru formatta girin");
           return;
         }
-        PreparedStatement dogrulaStatement = connection.prepareStatement("SELECT * FROM hocalar WHERE ad = ? AND soyad = ? AND sifre= ?");
-        dogrulaStatement.setString(1, adSoyadArray[0]);
-        dogrulaStatement.setString(2, adSoyadArray[1]);
-        dogrulaStatement.setString(3, ogretmenGirisSifreTextField.getText().trim());
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM hocalar WHERE ad = ? AND soyad = ? AND sifre= ?");
+        statement.setString(1, adSoyadArray[0]);
+        statement.setString(2, adSoyadArray[1]);
+        statement.setString(3, ogretmenGirisSifreTextField.getText().trim());
 
-        ResultSet resultSet = dogrulaStatement.executeQuery();
+        ResultSet resultSet = statement.executeQuery();
 
         if (resultSet.next()) {
-          System.out.println("Giriş başarılı.");
+          OgretmenEkrani(new Ogretmen(resultSet.getInt(1), resultSet.getString(3),
+          resultSet.getString(4), resultSet.getString(2),
+          (String[]) resultSet.getArray(5).getArray(), resultSet.getInt(6),
+          (String[]) resultSet.getArray(7).getArray()));
         } else {
           System.out.println("Giriş başarısız.");
         }
-
+        statement.close();
+        resultSet.close();
       } catch (SQLException ex) {
           throw new RuntimeException(ex);
         }
       }
     if (e.getSource() == ogrenciLoginButonu) {
       try {
-        String[] adSoyadArray = ogretmenGirisIsimTextField.getText().trim().split("\\s+");
+        String[] adSoyadArray = ogrenciGirisIsimTextField.getText().trim().split("\\s+");
         if(adSoyadArray.length != 2){
           JOptionPane.showMessageDialog(this, "Lutfen dogru formatta girin");
           return;
         }
-        PreparedStatement dogrulaStatement = connection.prepareStatement("SELECT * FROM ogrenciler WHERE ad = ? AND soyad = ? AND sifre= ?");
-        dogrulaStatement.setString(1, adSoyadArray[0]);
-        dogrulaStatement.setString(2, adSoyadArray[1]);
-        ResultSet resultSet = dogrulaStatement.executeQuery();
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM ogrenciler WHERE ad = ? AND soyad = ? AND sifre= ?");
+        statement.setString(1, adSoyadArray[0]);
+        statement.setString(2, adSoyadArray[1]);
+        statement.setString(3, ogrenciGirisSifreTextField.getText().trim());
+        ResultSet resultSet = statement.executeQuery();
 
         if (resultSet.next()) {
-          System.out.println("Giriş başarılı.");
+          OgrenciEkrani(new Ogrenci(resultSet.getInt(1), resultSet.getString(3),
+          resultSet.getString(4), resultSet.getString(2),
+          (String[]) resultSet.getArray(5).getArray(), resultSet.getFloat(7)));
 
         } else {
           System.out.println("Giriş başarısız.");
