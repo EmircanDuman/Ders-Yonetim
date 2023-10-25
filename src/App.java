@@ -22,6 +22,19 @@ public class App extends JFrame implements ActionListener, KeyListener {
   JButton yoneticiLoginButonu;
   JButton ogretmenLoginButonu;
   JButton ogrenciLoginButonu;
+  JButton yoneticiParametreleriKaydetmeButonu;
+  JButton rastgeleOgrenciOlusturButonu;
+  JButton yoneticiTalepleriListeleButonu;
+  JButton yoneticiOgretmenListeleButonu;
+  JButton yoneticiOgrenciListeleButonu;
+
+  JComboBox<String> yoneticiDurumComboBox;
+
+  JCheckBox ayniHocaMultCheckBox;
+
+  JSpinner ayniDersMaksTalepSpinner;
+  JSpinner talepMaksKarakterSpinner;
+  JSpinner rastgeleOgrenciOlusturSpinner;
 
   JTextField yoneticiGirisSifreTextField;
   JTextField ogretmenGirisIsimTextField;
@@ -34,6 +47,9 @@ public class App extends JFrame implements ActionListener, KeyListener {
   JLabel ogretmenGirisSifreLabel;
   JLabel ogrenciGirisIsimLabel;
   JLabel ogrenciGirisSifreLabel;
+  JLabel ayniDersMaksTalepLabel;
+  JLabel talepMaksKarakterLabel;
+  JLabel rastgeleOgrenciOlusturLabel;
 
   Color primary;
   Font mainFont;
@@ -228,6 +244,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
 
   void GUIAtama(){
     panel = new JPanel();
+    panel.setLayout(null);
     primary = new Color(147, 191, 207);
     mainFont = new Font("TimesRoman", Font.BOLD, 24);
 
@@ -235,10 +252,39 @@ public class App extends JFrame implements ActionListener, KeyListener {
     ogretmenGirisEkraniButonu = StandartGirisPaneliButonu("Ogretmen Girisi", 450, 330);
     ogrenciGirisEkraniButonu = StandartGirisPaneliButonu("Ogrenci Girisi", 450, 540);
     anaGirisEkraniDon = StandartGirisPaneliButonu("Geri don", 450, 680);
+    yoneticiTalepleriListeleButonu = StandartGirisPaneliButonu("Talepleri Listele", 550, 250);
+    yoneticiOgretmenListeleButonu = StandartGirisPaneliButonu("Ogretmenleri Listele", 550, 400);
+    yoneticiOgrenciListeleButonu = StandartGirisPaneliButonu("Ogrencileri Listele", 550, 550);
 
     yoneticiLoginButonu = StandartGirisPaneliButonu("Yonetici Olarak Gir", 450, 425);
     ogretmenLoginButonu = StandartGirisPaneliButonu("Ogretmen Olarak Gir", 450, 425);
     ogrenciLoginButonu = StandartGirisPaneliButonu("Ogrenci Olarak Gir", 450, 425);
+    yoneticiParametreleriKaydetmeButonu = StandartGirisPaneliButonu("Kaydet", 80,600);
+    rastgeleOgrenciOlusturButonu = StandartGirisPaneliButonu("Olustur", 870, 84);
+
+    ayniHocaMultCheckBox = new JCheckBox("Ayni hocadan cok sayida ders");
+    ayniHocaMultCheckBox.setBounds(60, 218, 450, 60);
+    ayniHocaMultCheckBox.setFont(mainFont);
+
+    yoneticiDurumComboBox = new JComboBox<String>(new String[]{"beklemede", "kabul", "iptal", "ret"});
+    yoneticiDurumComboBox.setBounds(80, 84, 300, 60);
+    yoneticiDurumComboBox.setFont(mainFont);
+    yoneticiDurumComboBox.setBackground(Color.white);
+
+    SpinnerNumberModel spinnerModel = new SpinnerNumberModel(1, 0, 10, 1);
+    ayniDersMaksTalepSpinner = new JSpinner(spinnerModel);
+    ayniDersMaksTalepSpinner.setBounds(80, 362, 300, 60);
+    ayniDersMaksTalepSpinner.setFont(mainFont);
+
+    SpinnerModel spinnerModel1 = new SpinnerNumberModel(100, 0, 1000, 10);
+    talepMaksKarakterSpinner = new JSpinner(spinnerModel1);
+    talepMaksKarakterSpinner.setBounds(80, 512, 300, 60);
+    talepMaksKarakterSpinner.setFont(mainFont);
+
+    SpinnerModel spinnerModel2 = new SpinnerNumberModel(1, 1, 50, 5);
+    rastgeleOgrenciOlusturSpinner = new JSpinner(spinnerModel2);
+    rastgeleOgrenciOlusturSpinner.setBounds(550, 84, 300, 60);
+    rastgeleOgrenciOlusturSpinner.setFont(mainFont);
 
     yoneticiGirisSifreTextField = StandartGirisPaneliTextField(500, 350);
     ogretmenGirisIsimTextField = StandartGirisPaneliTextField(500, 250);
@@ -251,8 +297,11 @@ public class App extends JFrame implements ActionListener, KeyListener {
     ogretmenGirisSifreLabel = StandartGirisPaneliLabel("Ogretmen sifresi giriniz:", 475, 300);
     ogrenciGirisIsimLabel = StandartGirisPaneliLabel("Ogrenci ismi ve soyismi giriniz:", 425, 200);
     ogrenciGirisSifreLabel = StandartGirisPaneliLabel("Ogrenci sifresi giriniz:", 475, 300);
+    ayniDersMaksTalepLabel = StandartGirisPaneliLabel("Ayni ders maks talep sayisi", 80, 320);
+    talepMaksKarakterLabel = StandartGirisPaneliLabel("Talep mesaji maks karakter sayisi", 60, 470);
+    rastgeleOgrenciOlusturLabel = StandartGirisPaneliLabel("Rastgele ogrenci olustur", 550, 40);
+    rastgeleOgrenciOlusturButonu.setSize(200, 60);
 
-    panel.setLayout(null);
     this.add(panel);
 
     GirisEkrani();
@@ -303,8 +352,29 @@ public class App extends JFrame implements ActionListener, KeyListener {
   panel.repaint();
   }
 
-  void YoneticiEkrani(){
+  // Talep durumu / aynı hoca mult / ayni ders mult / talep maks karakter / ilgi alanlari
+  // Öğrenciler listelenmeli / detaylı seceneği / düzenleme / ilgi alanlari belirleme
+  // Öğretmenler listelenmeli / detaylı seçeneği / düzenleme / dersleri açma
+  // rastgele öğrenci olusturma
+  // tüm öğrenci ve hocalari silme ? ya da öyle bir şey
 
+  void YoneticiEkrani(){
+  panel.removeAll();
+  panel.add(yoneticiDurumComboBox);
+  panel.add(ayniHocaMultCheckBox);
+  panel.add(ayniDersMaksTalepSpinner);
+  panel.add(ayniDersMaksTalepLabel);
+  panel.add(talepMaksKarakterSpinner);
+  panel.add(talepMaksKarakterLabel);
+  panel.add(yoneticiParametreleriKaydetmeButonu);
+  panel.add(rastgeleOgrenciOlusturSpinner);
+  panel.add(rastgeleOgrenciOlusturLabel);
+  panel.add(rastgeleOgrenciOlusturButonu);
+  panel.add(yoneticiTalepleriListeleButonu);
+  panel.add(yoneticiOgretmenListeleButonu);
+  panel.add(yoneticiOgrenciListeleButonu);
+  panel.add(anaGirisEkraniDon);
+  panel.repaint();
   }
 
   void OgretmenEkrani(Ogretmen ogretmen){
@@ -361,14 +431,14 @@ public class App extends JFrame implements ActionListener, KeyListener {
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT admin_sifresi FROM parametreler WHERE id = 1");
         if (resultSet.next()){
-          if (resultSet.getString("admin_sifresi").equals(yoneticiGirisSifreTextField.getText())){
-            System.out.println("basarili");
+          if (resultSet.getString("admin_sifresi").equals(yoneticiGirisSifreTextField.getText().trim())){
+            YoneticiEkrani();
           }
           else {
-            System.out.println("sifre yanlis");
+            JOptionPane.showMessageDialog(this, "Lutfen dogru sifreyi girin.");
           }
         }
-        else System.out.println("kayit yok");
+        else JOptionPane.showMessageDialog(this, "Kayit yok");
 
         statement.close();
         resultSet.close();
@@ -380,7 +450,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
       try {
         String[] adSoyadArray = ogretmenGirisIsimTextField.getText().trim().split("\\s+");
         if(adSoyadArray.length != 2){
-          JOptionPane.showMessageDialog(this, "Lutfen dogru formatta girin");
+          JOptionPane.showMessageDialog(this, "Lutfen dogru formatta girin.");
           return;
         }
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM hocalar WHERE ad = ? AND soyad = ? AND sifre= ?");
@@ -396,7 +466,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
           (String[]) resultSet.getArray(5).getArray(), resultSet.getInt(6),
           (String[]) resultSet.getArray(7).getArray()));
         } else {
-          System.out.println("Giriş başarısız.");
+          JOptionPane.showMessageDialog(this, "Giris basarisiz.");
         }
         statement.close();
         resultSet.close();
@@ -408,7 +478,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
       try {
         String[] adSoyadArray = ogrenciGirisIsimTextField.getText().trim().split("\\s+");
         if(adSoyadArray.length != 2){
-          JOptionPane.showMessageDialog(this, "Lutfen dogru formatta girin");
+          JOptionPane.showMessageDialog(this, "Lutfen dogru formatta girin.");
           return;
         }
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM ogrenciler WHERE ad = ? AND soyad = ? AND sifre= ?");
@@ -421,10 +491,11 @@ public class App extends JFrame implements ActionListener, KeyListener {
           OgrenciEkrani(new Ogrenci(resultSet.getInt(1), resultSet.getString(3),
           resultSet.getString(4), resultSet.getString(2),
           (String[]) resultSet.getArray(5).getArray(), resultSet.getFloat(7)));
-
         } else {
-          System.out.println("Giriş başarısız.");
+          JOptionPane.showMessageDialog(this, "Giris basarisiz.");
         }
+        statement.close();
+        resultSet.close();
       } catch (SQLException ex) {
           throw new RuntimeException(ex);
         }
