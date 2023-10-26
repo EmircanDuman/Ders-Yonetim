@@ -54,6 +54,12 @@ public class App extends JFrame implements ActionListener, KeyListener {
   Color primary;
   Font mainFont;
 
+  enum TalepDurumu{
+    anlasma,
+    rastgele,
+    durdur
+  }
+
   //---------------------------------------------UI BİLEŞENLERİ TANIMLAMA ALANI SON
 
   //---------------------------------------------PRIVATE CLASS ALANI SONU
@@ -266,7 +272,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
     ayniHocaMultCheckBox.setBounds(60, 218, 450, 60);
     ayniHocaMultCheckBox.setFont(mainFont);
 
-    yoneticiDurumComboBox = new JComboBox<String>(new String[]{"beklemede", "kabul", "iptal", "ret"});
+    yoneticiDurumComboBox = new JComboBox<String>(new String[]{"anlasma", "rastgele", "durdur"});
     yoneticiDurumComboBox.setBounds(80, 84, 300, 60);
     yoneticiDurumComboBox.setFont(mainFont);
     yoneticiDurumComboBox.setBackground(Color.white);
@@ -374,6 +380,27 @@ public class App extends JFrame implements ActionListener, KeyListener {
   panel.add(yoneticiOgretmenListeleButonu);
   panel.add(yoneticiOgrenciListeleButonu);
   panel.add(anaGirisEkraniDon);
+    try {
+      PreparedStatement statement = connection.prepareStatement("SELECT * FROM parametreler WHERE id = 1");
+      ResultSet resultSet = statement.executeQuery();
+      if(resultSet.next()){
+        switch (TalepDurumu.valueOf(resultSet.getString(2))){
+          case anlasma -> yoneticiDurumComboBox.setSelectedIndex(0);
+          case rastgele -> yoneticiDurumComboBox.setSelectedIndex(1);
+          case durdur -> yoneticiDurumComboBox.setSelectedIndex(2);
+        }
+        if (resultSet.getBoolean(3)) ayniHocaMultCheckBox.setSelected(true);
+        else ayniHocaMultCheckBox.setSelected(false);
+
+        ayniDersMaksTalepSpinner.setValue(resultSet.getInt(4));
+        talepMaksKarakterSpinner.setValue(resultSet.getInt(5));
+      }
+
+      statement.close();
+      resultSet.close();
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
   panel.repaint();
   }
 
@@ -500,6 +527,25 @@ public class App extends JFrame implements ActionListener, KeyListener {
           throw new RuntimeException(ex);
         }
       }
+
+    if (e.getSource() == yoneticiParametreleriKaydetmeButonu){
+      try {
+        PreparedStatement preparedStatement = connection.prepareStatement("UPDATE public.parametreler " +
+          "SET durum=?, ayni_hoca_mult=?, ayni_ders_mult=?, talep_maks_karakter=? " + "WHERE id = 1");
+
+        preparedStatement.setObject(1, (String) yoneticiDurumComboBox.getSelectedItem(), Types.OTHER);
+        preparedStatement.setBoolean(2,ayniHocaMultCheckBox.isSelected());
+        preparedStatement.setInt(3, (Integer) ayniDersMaksTalepSpinner.getValue());
+        preparedStatement.setInt(4, (Integer) talepMaksKarakterSpinner.getValue());
+
+        preparedStatement.executeUpdate();
+
+        preparedStatement.close();
+
+      } catch (SQLException ex) {
+        throw new RuntimeException(ex);
+      }
+    }
   }
 
   @Override
