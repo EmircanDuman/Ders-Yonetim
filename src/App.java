@@ -64,12 +64,12 @@ public class App extends JFrame implements ActionListener, KeyListener {
 
   //---------------------------------------------PRIVATE CLASS ALANI SONU
   private class Ogrenci{
-    private Integer no;
-    private String ad;
-    private String soyad;
-    private String sifre;
-    private String[] ilgiAlanlari;
-    private Float genelNot;
+    public Integer no;
+    public String ad;
+    public String soyad;
+    public String sifre;
+    public String[] ilgiAlanlari;
+    public Float genelNot;
 
     public Ogrenci(Integer no, String ad, String soyad, String sifre, String[] ilgiAlanlari, Float genelNot) {
       this.no = no;
@@ -80,64 +80,16 @@ public class App extends JFrame implements ActionListener, KeyListener {
       this.genelNot = genelNot;
     }
 
-    public Integer getNo() {
-      return no;
-    }
-
-    public void setNo(Integer no) {
-      this.no = no;
-    }
-
-    public String getAd() {
-      return ad;
-    }
-
-    public void setAd(String ad) {
-      this.ad = ad;
-    }
-
-    public String getSoyad() {
-      return soyad;
-    }
-
-    public void setSoyad(String soyad) {
-      this.soyad = soyad;
-    }
-
-    public String getSifre() {
-      return sifre;
-    }
-
-    public void setSifre(String sifre) {
-      this.sifre = sifre;
-    }
-
-    public String[] getIlgiAlanlari() {
-      return ilgiAlanlari;
-    }
-
-    public void setIlgiAlanlari(String[] ilgiAlanlari) {
-      this.ilgiAlanlari = ilgiAlanlari;
-    }
-
-    public Float getGenelNot() {
-      return genelNot;
-    }
-
-    public void setGenelNot(Float genelNot) {
-      this.genelNot = genelNot;
-    }
-
   }
 
   private class Ogretmen{
-    private Integer sicilNo;
-    private String ad;
-    private String soyad;
-    private String sifre;
-    private String[] ilgiAlanlari;
-    private Integer kontenjanSayisi;
-    private String[] acilanDersler;
+    public Integer sicilNo;
+    public String ad;
+    public String soyad;
+    public String sifre;
+    public String[] ilgiAlanlari;
+    public Integer kontenjanSayisi;
+    public String[] acilanDersler;
 
     public Ogretmen(Integer sicilNo, String ad, String soyad, String sifre, String[] ilgiAlanlari, Integer kontenjanSayisi, String[] acilanDersler) {
       this.sicilNo = sicilNo;
@@ -146,62 +98,6 @@ public class App extends JFrame implements ActionListener, KeyListener {
       this.sifre = sifre;
       this.ilgiAlanlari = ilgiAlanlari;
       this.kontenjanSayisi = kontenjanSayisi;
-      this.acilanDersler = acilanDersler;
-    }
-
-    public Integer getSicilNo() {
-      return sicilNo;
-    }
-
-    public void setSicilNo(Integer sicilNo) {
-      this.sicilNo = sicilNo;
-    }
-
-    public String getAd() {
-      return ad;
-    }
-
-    public void setAd(String ad) {
-      this.ad = ad;
-    }
-
-    public String getSoyad() {
-      return soyad;
-    }
-
-    public void setSoyad(String soyad) {
-      this.soyad = soyad;
-    }
-
-    public String getSifre() {
-      return sifre;
-    }
-
-    public void setSifre(String sifre) {
-      this.sifre = sifre;
-    }
-
-    public String[] getIlgiAlanlari() {
-      return ilgiAlanlari;
-    }
-
-    public void setIlgiAlanlari(String[] ilgiAlanlari) {
-      this.ilgiAlanlari = ilgiAlanlari;
-    }
-
-    public Integer getKontenjanSayisi() {
-      return kontenjanSayisi;
-    }
-
-    public void setKontenjanSayisi(Integer kontenjanSayisi) {
-      this.kontenjanSayisi = kontenjanSayisi;
-    }
-
-    public String[] getAcilanDersler() {
-      return acilanDersler;
-    }
-
-    public void setAcilanDersler(String[] acilanDersler) {
       this.acilanDersler = acilanDersler;
     }
   }
@@ -325,37 +221,37 @@ public class App extends JFrame implements ActionListener, KeyListener {
   }
 
   void YoneticiGirisEkrani(){
-  panel.removeAll();
-  TextFieldTemizle();
-  panel.add(yoneticiGirisSifreTextField);
-  panel.add(anaGirisEkraniDon);
-  panel.add(yoneticiGirisLabel);
-  panel.add(yoneticiLoginButonu);
-  panel.repaint();
+    panel.removeAll();
+    TextFieldTemizle();
+    panel.add(yoneticiGirisSifreTextField);
+    panel.add(anaGirisEkraniDon);
+    panel.add(yoneticiGirisLabel);
+    panel.add(yoneticiLoginButonu);
+    panel.repaint();
   }
 
   void OgretmenGirisEkrani(){
-  panel.removeAll();
-  TextFieldTemizle();
-  panel.add(ogretmenGirisIsimTextField);
-  panel.add(ogretmenGirisSifreTextField);
-  panel.add(anaGirisEkraniDon);
-  panel.add(ogretmenGirisIsimLabel);
-  panel.add(ogretmenGirisSifreLabel);
-  panel.add(ogretmenLoginButonu);
-  panel.repaint();
+    panel.removeAll();
+    TextFieldTemizle();
+    panel.add(ogretmenGirisIsimTextField);
+    panel.add(ogretmenGirisSifreTextField);
+    panel.add(anaGirisEkraniDon);
+    panel.add(ogretmenGirisIsimLabel);
+    panel.add(ogretmenGirisSifreLabel);
+    panel.add(ogretmenLoginButonu);
+    panel.repaint();
   }
 
   void OgrenciGirisEkrani(){
-  panel.removeAll();
-  TextFieldTemizle();
-  panel.add(ogrenciGirisIsimTextField);
-  panel.add(ogrenciGirisSifreTextField);
-  panel.add(anaGirisEkraniDon);
-  panel.add(ogrenciGirisIsimLabel);
-  panel.add(ogrenciGirisSifreLabel);
-  panel.add(ogrenciLoginButonu);
-  panel.repaint();
+    panel.removeAll();
+    TextFieldTemizle();
+    panel.add(ogrenciGirisIsimTextField);
+    panel.add(ogrenciGirisSifreTextField);
+    panel.add(anaGirisEkraniDon);
+    panel.add(ogrenciGirisIsimLabel);
+    panel.add(ogrenciGirisSifreLabel);
+    panel.add(ogrenciLoginButonu);
+    panel.repaint();
   }
 
   // Talep durumu / aynı hoca mult / ayni ders mult / talep maks karakter / ilgi alanlari
@@ -365,21 +261,21 @@ public class App extends JFrame implements ActionListener, KeyListener {
   // tüm öğrenci ve hocalari silme ? ya da öyle bir şey
 
   void YoneticiEkrani(){
-  panel.removeAll();
-  panel.add(yoneticiDurumComboBox);
-  panel.add(ayniHocaMultCheckBox);
-  panel.add(ayniDersMaksTalepSpinner);
-  panel.add(ayniDersMaksTalepLabel);
-  panel.add(talepMaksKarakterSpinner);
-  panel.add(talepMaksKarakterLabel);
-  panel.add(yoneticiParametreleriKaydetmeButonu);
-  panel.add(rastgeleOgrenciOlusturSpinner);
-  panel.add(rastgeleOgrenciOlusturLabel);
-  panel.add(rastgeleOgrenciOlusturButonu);
-  panel.add(yoneticiTalepleriListeleButonu);
-  panel.add(yoneticiOgretmenListeleButonu);
-  panel.add(yoneticiOgrenciListeleButonu);
-  panel.add(anaGirisEkraniDon);
+    panel.removeAll();
+    panel.add(yoneticiDurumComboBox);
+    panel.add(ayniHocaMultCheckBox);
+    panel.add(ayniDersMaksTalepSpinner);
+    panel.add(ayniDersMaksTalepLabel);
+    panel.add(talepMaksKarakterSpinner);
+    panel.add(talepMaksKarakterLabel);
+    panel.add(yoneticiParametreleriKaydetmeButonu);
+    panel.add(rastgeleOgrenciOlusturSpinner);
+    panel.add(rastgeleOgrenciOlusturLabel);
+    panel.add(rastgeleOgrenciOlusturButonu);
+    panel.add(yoneticiTalepleriListeleButonu);
+    panel.add(yoneticiOgretmenListeleButonu);
+    panel.add(yoneticiOgrenciListeleButonu);
+    panel.add(anaGirisEkraniDon);
     try {
       PreparedStatement statement = connection.prepareStatement("SELECT * FROM parametreler WHERE id = 1");
       ResultSet resultSet = statement.executeQuery();
@@ -401,7 +297,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
-  panel.repaint();
+    panel.repaint();
   }
 
   void OgretmenEkrani(Ogretmen ogretmen){
