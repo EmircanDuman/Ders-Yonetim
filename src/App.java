@@ -4,6 +4,8 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 // KENDİ ÖĞRENCİ TRANSKRİPTİN İLE YAPMAN LAZIM
 
@@ -35,6 +37,8 @@ public class App extends JFrame implements ActionListener, KeyListener {
   JButton yoneticiIlgiAlaniSilButonu;
 
   JComboBox<String> yoneticiDurumComboBox;
+
+  JTable table;
 
   JCheckBox ayniHocaMultCheckBox;
 
@@ -161,10 +165,10 @@ public class App extends JFrame implements ActionListener, KeyListener {
     ogretmenGirisEkraniButonu = StandartGirisPaneliButonu("Ogretmen Girisi", 450, 330);
     ogrenciGirisEkraniButonu = StandartGirisPaneliButonu("Ogrenci Girisi", 450, 540);
     anaGirisEkraniDon = StandartGirisPaneliButonu("Geri don", 450, 680);
-    yoneticiTalepleriListeleButonu = StandartGirisPaneliButonu("Talepleri Listele", 550, 250);
-    yoneticiOgretmenListeleButonu = StandartGirisPaneliButonu("Ogretmenleri Listele", 550, 400);
-    yoneticiOgrenciListeleButonu = StandartGirisPaneliButonu("Ogrencileri Listele", 550, 550);
-    yoneticiIlgiAlanlariListeleButonu = StandartGirisPaneliButonu("Ilgi Alanlari Listele", 880, 250);
+    yoneticiTalepleriListeleButonu = StandartGirisPaneliButonu("Talepleri Listele", 500, 250);
+    yoneticiOgretmenListeleButonu = StandartGirisPaneliButonu("Ogretmenleri Listele", 500, 400);
+    yoneticiOgrenciListeleButonu = StandartGirisPaneliButonu("Ogrencileri Listele", 500, 550);
+    yoneticiIlgiAlanlariListeleButonu = StandartGirisPaneliButonu("Ilgi Alanlari Listele", 850, 250);
     yoneticiGeriButonu = StandartGirisPaneliButonu("Geri", 450, 600);
     yoneticiIlgiAlaniEkleButonu = StandartGirisPaneliButonu("Ekle", 885, 160);
     yoneticiIlgiAlaniEkleButonu.setSize(200, 60);
@@ -178,7 +182,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
     rastgeleOgrenciOlusturButonu = StandartGirisPaneliButonu("Olustur", 870, 84);
 
     ayniHocaMultCheckBox = new JCheckBox("Ayni hocadan cok sayida ders");
-    ayniHocaMultCheckBox.setBounds(60, 218, 450, 60);
+    ayniHocaMultCheckBox.setBounds(60, 218, 400, 60);
     ayniHocaMultCheckBox.setFont(mainFont);
 
     yoneticiDurumComboBox = new JComboBox<String>(new String[]{"anlasma", "rastgele", "durdur"});
@@ -326,7 +330,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
         for(String ilgiAlani : (String[]) resultSet.getArray(1).getArray()){
           model.addRow(new Object[]{ilgiAlani});
         }
-        JTable table = new JTable(model);
+        table = new JTable(model);
         table.setRowHeight(60);
         table.setFont(mainFont);
 
@@ -495,6 +499,61 @@ public class App extends JFrame implements ActionListener, KeyListener {
 
     if(e.getSource()==yoneticiGeriButonu){
       YoneticiEkrani();
+    }
+    if(e.getSource() == yoneticiIlgiAlaniEkleButonu){
+      try {
+        PreparedStatement preparedStatement = connection.prepareStatement("UPDATE parametreler SET ilgi_alanlari = ? WHERE id = 1");
+        if (!yoneticiIlgiAlaniEkleTextField.getText().trim().equals("")) {
+          Statement statement = connection.createStatement();
+          ResultSet resultSet = statement.executeQuery("SELECT ilgi_alanlari FROM parametreler WHERE id = 1");
+          if (resultSet.next()) {
+            if(Arrays.asList((String[]) resultSet.getArray(1).getArray()).contains(yoneticiIlgiAlaniEkleTextField.getText())) return;
+
+            String[] strings = (String[]) resultSet.getArray(1).getArray();
+            String[] strings1 = new String[strings.length + 1];
+            System.arraycopy(strings, 0, strings1, 0, strings.length);
+            strings1[strings1.length - 1] = yoneticiIlgiAlaniEkleTextField.getText().toUpperCase();
+            Array sqlArray = connection.createArrayOf("text", strings1);
+            preparedStatement.setArray(1, sqlArray);
+            preparedStatement.executeUpdate();
+
+            preparedStatement.close();
+            statement.close();
+            resultSet.close();
+
+            yoneticiIlgiAlaniEkleTextField.setText("");
+            IlgiAlanlariListeleEkrani();
+          }
+        }
+      } catch (SQLException ex) {
+        throw new RuntimeException(ex);
+      }
+    }
+    if(e.getSource() == yoneticiIlgiAlaniSilButonu && table.getSelectedRow() != -1){
+      try{
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT ilgi_alanlari FROM parametreler WHERE id = 1");
+        PreparedStatement preparedStatement = connection.prepareStatement("UPDATE parametreler SET ilgi_alanlari = ? WHERE id = 1");
+        if (resultSet.next()){
+          String[] strings = (String[]) resultSet.getArray(1).getArray();
+
+          ArrayList<String> stringList = new ArrayList<>(Arrays.asList(strings));
+          stringList.remove(table.getValueAt(table.getSelectedRow(), 0));
+          strings = stringList.toArray(new String[0]);
+          Array sqlArray = connection.createArrayOf("text", strings);
+          preparedStatement.setArray(1, sqlArray);
+          preparedStatement.executeUpdate();
+
+          statement.close();
+          resultSet.close();
+          preparedStatement.close();
+
+          IlgiAlanlariListeleEkrani();
+        }
+      }
+      catch (SQLException ex){
+        throw new RuntimeException(ex);
+      }
     }
   }
 
