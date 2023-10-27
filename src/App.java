@@ -35,6 +35,11 @@ public class App extends JFrame implements ActionListener, KeyListener {
   JButton yoneticiGeriButonu;
   JButton yoneticiIlgiAlaniEkleButonu;
   JButton yoneticiIlgiAlaniSilButonu;
+  JButton ogretmenTalepleriListeleButonu;
+  JButton ogretmenOgrencileriListeleButonu;
+  JButton ogretmenDersleriGoruntuleButonu;
+  JButton ogretmenTalepKabulEtButonu;
+  JButton ogretmenTalepReddetButonu;
 
   JComboBox<String> yoneticiDurumComboBox;
 
@@ -65,10 +70,19 @@ public class App extends JFrame implements ActionListener, KeyListener {
   Color primary;
   Font mainFont;
 
+  Ogretmen ogretmen;
+
   enum TalepDurumu{
     anlasma,
     rastgele,
     durdur
+  }
+
+  enum DersTalepDurumu{
+    beklemede,
+    kabul,
+    iptal,
+    ret
   }
 
   //---------------------------------------------UI BİLEŞENLERİ TANIMLAMA ALANI SON
@@ -174,6 +188,11 @@ public class App extends JFrame implements ActionListener, KeyListener {
     yoneticiIlgiAlaniEkleButonu.setSize(200, 60);
     yoneticiIlgiAlaniSilButonu = StandartGirisPaneliButonu("Sil", 885, 250);
     yoneticiIlgiAlaniSilButonu.setSize(200, 60);
+    ogretmenTalepKabulEtButonu = StandartGirisPaneliButonu("Kabul Et", 70, 500);
+    ogretmenTalepReddetButonu = StandartGirisPaneliButonu("Reddet", 70, 600);
+    ogretmenTalepleriListeleButonu = StandartGirisPaneliButonu("Talepleri Listele", 70, 100);
+    ogretmenOgrencileriListeleButonu = StandartGirisPaneliButonu("Ogrencileri Listele", 70, 200);
+    ogretmenDersleriGoruntuleButonu = StandartGirisPaneliButonu("Dersleri Goruntule", 70, 300);
 
     yoneticiLoginButonu = StandartGirisPaneliButonu("Yonetici Olarak Gir", 450, 425);
     ogretmenLoginButonu = StandartGirisPaneliButonu("Ogretmen Olarak Gir", 450, 425);
@@ -352,7 +371,44 @@ public class App extends JFrame implements ActionListener, KeyListener {
   }
 
   void OgretmenEkrani(Ogretmen ogretmen){
+    panel.removeAll();
+    this.ogretmen = ogretmen;
+    panel.add(ogretmenTalepleriListeleButonu);
+    panel.add(ogretmenOgrencileriListeleButonu);
+    panel.add(ogretmenDersleriGoruntuleButonu);
 
+    OgretmenEkraniTalepListele(ogretmen);
+
+    panel.repaint();
+  }
+
+  void OgretmenEkraniTalepListele(Ogretmen ogretmen){
+    try {
+      PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM anlasmalar WHERE ogretmen_no = ?");
+      preparedStatement.setInt(1, ogretmen.sicilNo);
+      ResultSet resultSet = preparedStatement.executeQuery();
+
+      DefaultTableModel model = new DefaultTableModel();
+      model.addColumn("Anlasma No");
+      model.addColumn("Ogrenci No");
+      model.addColumn("Ders");
+      model.addColumn("Durum");
+      while(resultSet.next()){
+        model.addRow(new Object[]{resultSet.getInt(1), resultSet.getInt(2), resultSet.getString(4), DersTalepDurumu.valueOf(resultSet.getString(8)).toString()});
+      }
+      JTable table = new JTable(model);
+      table.setFont(mainFont);
+      table.setRowHeight(60);
+      JScrollPane scrollPane = new JScrollPane(table);
+      scrollPane.setBounds(450, 100, 600, 600);
+
+      panel.add(scrollPane);
+      panel.add(ogretmenTalepKabulEtButonu);
+      panel.add(ogretmenTalepReddetButonu);
+    }
+    catch (SQLException ex){
+      throw new RuntimeException(ex);
+    }
   }
 
   void OgrenciEkrani(Ogrenci ogrenci){
@@ -400,7 +456,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
       GirisEkrani();
     }
 
-    if(e.getSource()==yoneticiLoginButonu){
+    if(e.getSource() == yoneticiLoginButonu){
       try {
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT admin_sifresi FROM parametreler WHERE id = 1");
@@ -554,6 +610,9 @@ public class App extends JFrame implements ActionListener, KeyListener {
       catch (SQLException ex){
         throw new RuntimeException(ex);
       }
+    }
+    if(e.getSource() == ogretmenTalepleriListeleButonu){
+      OgretmenEkraniTalepListele(this.ogretmen);
     }
   }
 
