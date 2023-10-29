@@ -40,6 +40,9 @@ public class App extends JFrame implements ActionListener, KeyListener {
   JButton TalepKabulEtButonu;
   JButton TalepReddetButonu;
   JButton yoneticiTabloGeriButonu;
+  JButton yoneticiDersleriListeleButonu;
+  JButton yoneticiDersEkleButonu;
+  JButton yoneticiDersSilButonu;
 
   JComboBox<String> yoneticiDurumComboBox;
 
@@ -57,6 +60,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
   JTextField ogrenciGirisIsimTextField;
   JTextField ogrenciGirisSifreTextField;
   JTextField yoneticiIlgiAlaniEkleTextField;
+  JTextField yoneticiDersEkleTextField;
 
   JLabel yoneticiGirisLabel;
   JLabel ogretmenGirisIsimLabel;
@@ -183,11 +187,18 @@ public class App extends JFrame implements ActionListener, KeyListener {
     yoneticiOgretmenListeleButonu = StandartGirisPaneliButonu("Ogretmenleri Listele", 500, 400);
     yoneticiOgrenciListeleButonu = StandartGirisPaneliButonu("Ogrencileri Listele", 500, 550);
     yoneticiIlgiAlanlariListeleButonu = StandartGirisPaneliButonu("Ilgi Alanlari Listele", 850, 250);
+    yoneticiDersleriListeleButonu = StandartGirisPaneliButonu("Dersleri Listele", 850, 400);
     yoneticiGeriButonu = StandartGirisPaneliButonu("Geri", 450, 600);
     yoneticiIlgiAlaniEkleButonu = StandartGirisPaneliButonu("Ekle", 885, 160);
     yoneticiIlgiAlaniEkleButonu.setSize(200, 60);
     yoneticiIlgiAlaniSilButonu = StandartGirisPaneliButonu("Sil", 885, 250);
     yoneticiIlgiAlaniSilButonu.setSize(200, 60);
+
+    yoneticiDersEkleButonu = StandartGirisPaneliButonu("Ekle", 885, 160);
+    yoneticiDersEkleButonu.setSize(200, 60);
+    yoneticiDersSilButonu = StandartGirisPaneliButonu("Sil", 885, 250);
+    yoneticiDersSilButonu.setSize(200, 60);
+
     TalepKabulEtButonu = StandartGirisPaneliButonu("Kabul Et", 70, 500);
     TalepReddetButonu = StandartGirisPaneliButonu("Reddet", 70, 600);
     ogretmenTalepleriListeleButonu = StandartGirisPaneliButonu("Talepleri Listele", 70, 100);
@@ -231,6 +242,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
     ogrenciGirisIsimTextField = StandartGirisPaneliTextField(500, 250);
     ogrenciGirisSifreTextField = StandartGirisPaneliTextField(500, 350);
     yoneticiIlgiAlaniEkleTextField = StandartGirisPaneliTextField(890, 100);
+    yoneticiDersEkleTextField = StandartGirisPaneliTextField(890, 100);
 
     yoneticiGirisLabel = StandartGirisPaneliLabel("Yonetici sifresi giriniz:", 475, 300);
     ogretmenGirisIsimLabel = StandartGirisPaneliLabel("Ogretmen ismi ve soyismi giriniz:", 425, 200);
@@ -314,6 +326,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
     panel.add(yoneticiOgretmenListeleButonu);
     panel.add(yoneticiOgrenciListeleButonu);
     panel.add(yoneticiIlgiAlanlariListeleButonu);
+    panel.add(yoneticiDersleriListeleButonu);
     panel.add(anaGirisEkraniDon);
     try {
       PreparedStatement statement = connection.prepareStatement("SELECT * FROM parametreler WHERE id = 1");
@@ -332,6 +345,38 @@ public class App extends JFrame implements ActionListener, KeyListener {
 
       statement.close();
       resultSet.close();
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+    panel.repaint();
+  }
+
+  void DersleriListeleEkrani(){
+    panel.removeAll();
+    try {
+      Statement statement = connection.createStatement();
+      ResultSet resultSet = statement.executeQuery("SELECT dersler FROM parametreler WHERE id = 1");
+      if(resultSet.next()){
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("Ilgi Alanlari");
+        for(String ilgiAlani : (String[]) resultSet.getArray(1).getArray()){
+          model.addRow(new Object[]{ilgiAlani});
+        }
+        table = new JTable(model);
+        table.setRowHeight(60);
+        table.setFont(mainFont);
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBounds(400, 70, 400, 500);
+        panel.add(scrollPane);
+        panel.add(yoneticiGeriButonu);
+        panel.add(yoneticiDersEkleButonu);
+        panel.add(yoneticiDersEkleTextField);
+        panel.add(yoneticiDersSilButonu);
+
+        statement.close();
+        resultSet.close();
+      }
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
@@ -388,10 +433,11 @@ public class App extends JFrame implements ActionListener, KeyListener {
       DefaultTableModel model = new DefaultTableModel();
       model.addColumn("Anlasma No");
       model.addColumn("Ogrenci No");
+      model.addColumn("Hoca No");
       model.addColumn("Ders");
       model.addColumn("Durum");
       while(resultSet.next()){
-        model.addRow(new Object[]{resultSet.getInt(1), resultSet.getInt(2), resultSet.getString(4), DersTalepDurumu.valueOf(resultSet.getString(8)).toString()});
+        model.addRow(new Object[]{resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getString(4), DersTalepDurumu.valueOf(resultSet.getString(8)).toString()});
       }
       table = new JTable(model);
       table.setFont(mainFont);
@@ -422,10 +468,11 @@ public class App extends JFrame implements ActionListener, KeyListener {
       DefaultTableModel model = new DefaultTableModel();
       model.addColumn("Anlasma No");
       model.addColumn("Ogrenci No");
+      model.addColumn("Hoca No");
       model.addColumn("Ders");
       model.addColumn("Durum");
       while(resultSet.next()){
-        model.addRow(new Object[]{resultSet.getInt(1), resultSet.getInt(2), resultSet.getString(4), DersTalepDurumu.valueOf(resultSet.getString(8)).toString()});
+        model.addRow(new Object[]{resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getString(4), DersTalepDurumu.valueOf(resultSet.getString(8)).toString()});
       }
       table = new JTable(model);
       table.setFont(mainFont);
@@ -698,6 +745,63 @@ public class App extends JFrame implements ActionListener, KeyListener {
         throw new RuntimeException(ex);
       }
     }
+
+    if(e.getSource() == yoneticiDersEkleButonu){
+      try {
+        PreparedStatement preparedStatement = connection.prepareStatement("UPDATE parametreler SET dersler = ? WHERE id = 1");
+        if (!yoneticiDersEkleTextField.getText().trim().equals("")) {
+          Statement statement = connection.createStatement();
+          ResultSet resultSet = statement.executeQuery("SELECT dersler FROM parametreler WHERE id = 1");
+          if (resultSet.next()) {
+            if(Arrays.asList((String[]) resultSet.getArray(1).getArray()).contains(yoneticiDersEkleTextField.getText())) return;
+
+            String[] strings = (String[]) resultSet.getArray(1).getArray();
+            String[] strings1 = new String[strings.length + 1];
+            System.arraycopy(strings, 0, strings1, 0, strings.length);
+            strings1[strings1.length - 1] = yoneticiDersEkleTextField.getText().toUpperCase();
+            Array sqlArray = connection.createArrayOf("text", strings1);
+            preparedStatement.setArray(1, sqlArray);
+            preparedStatement.executeUpdate();
+
+            preparedStatement.close();
+            statement.close();
+            resultSet.close();
+
+            yoneticiDersEkleTextField.setText("");
+            DersleriListeleEkrani();
+          }
+        }
+      } catch (SQLException ex) {
+        throw new RuntimeException(ex);
+      }
+    }
+    if(e.getSource() == yoneticiDersSilButonu && table.getSelectedRow() != -1){
+      try{
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT dersler FROM parametreler WHERE id = 1");
+        PreparedStatement preparedStatement = connection.prepareStatement("UPDATE parametreler SET dersler = ? WHERE id = 1");
+        if (resultSet.next()){
+          String[] strings = (String[]) resultSet.getArray(1).getArray();
+
+          ArrayList<String> stringList = new ArrayList<>(Arrays.asList(strings));
+          stringList.remove(table.getValueAt(table.getSelectedRow(), 0));
+          strings = stringList.toArray(new String[0]);
+          Array sqlArray = connection.createArrayOf("text", strings);
+          preparedStatement.setArray(1, sqlArray);
+          preparedStatement.executeUpdate();
+
+          statement.close();
+          resultSet.close();
+          preparedStatement.close();
+
+          DersleriListeleEkrani();
+        }
+      }
+      catch (SQLException ex){
+        throw new RuntimeException(ex);
+      }
+    }
+
     if(e.getSource() == ogretmenTalepleriListeleButonu){
       OgretmenEkraniTalepListele(this.ogretmen);
     }
@@ -707,7 +811,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
         preparedStatement.setObject(1, DersTalepDurumu.kabul, Types.OTHER);
         preparedStatement.setInt(2, (Integer) table.getValueAt(table.getSelectedRow(), 1));
         preparedStatement.executeUpdate();
-        table.setValueAt("kabul", table.getSelectedRow(), 3);
+        table.setValueAt("kabul", table.getSelectedRow(), 4);
 
         panel.repaint();
         preparedStatement.close();
@@ -722,7 +826,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
         preparedStatement.setObject(1, DersTalepDurumu.ret, Types.OTHER);
         preparedStatement.setInt(2, (Integer) table.getValueAt(table.getSelectedRow(), 1));
         preparedStatement.executeUpdate();
-        table.setValueAt("ret", table.getSelectedRow(), 3);
+        table.setValueAt("ret", table.getSelectedRow(), 4);
 
         panel.repaint();
         preparedStatement.close();
@@ -736,6 +840,9 @@ public class App extends JFrame implements ActionListener, KeyListener {
     }
     if(e.getSource() == yoneticiTalepleriListeleButonu){
       YoneticiTalepleriListele();
+    }
+    if (e.getSource() == yoneticiDersleriListeleButonu){
+      DersleriListeleEkrani();
     }
   }
 
