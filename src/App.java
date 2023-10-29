@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
 import java.util.*;
+import java.util.List;
 
 // KENDİ ÖĞRENCİ TRANSKRİPTİN İLE YAPMAN LAZIM
 
@@ -408,9 +409,62 @@ public class App extends JFrame implements ActionListener, KeyListener {
     }
   }
 
+  void OgretmenOgrencileriListele(){
+    try {
+      Statement statement = connection.createStatement();
+      ResultSet resultSet = statement.executeQuery("SELECT * FROM ogrenciler");
+
+      PreparedStatement preparedStatement = connection.prepareStatement("SELECT ilgi_alanlari FROM hocalar WHERE sicil_no = ?");
+      preparedStatement.setInt(1, ogretmen.sicilNo);
+      ResultSet resultSet1 = preparedStatement.executeQuery();
+
+      DefaultTableModel model = new DefaultTableModel();
+      model.addColumn("Ogrenci No");
+      model.addColumn("Ad");
+      model.addColumn("Soyad");
+      model.addColumn("Ilgi Alanlari");
+      resultSet1.next();
+      while (resultSet.next()){
+        List<String> intersection = new ArrayList<>();
+        Set<String> set1 = new HashSet<>(Arrays.asList((String[]) resultSet1.getArray(1).getArray()));
+        for (String element : (String[]) resultSet.getArray(5).getArray()) {
+          if (set1.contains(element)) {
+            intersection.add(element);
+          }
+        }
+        String[] ortakIlgiAlanlari = intersection.toArray(new String[0]);
+        if(ortakIlgiAlanlari.length != 0){
+          model.addRow(new Object[]{resultSet.getInt(1), resultSet.getString(3), resultSet.getString(4), String.join(", ", ortakIlgiAlanlari)});
+        }
+      }
+
+      resultSet1.close();
+      resultSet.close();
+      statement.close();
+      preparedStatement.close();
+
+      table = new JTable(model);
+      table.setFont(mainFont);
+      table.setRowHeight(60);
+      JScrollPane scrollPane = new JScrollPane(table);
+      scrollPane.setBounds(450, 100, 600, 600);
+
+      panel.removeAll();
+      panel.add(ogretmenTalepleriListeleButonu);
+      panel.add(ogretmenOgrencileriListeleButonu);
+      panel.add(ogretmenDersleriGoruntuleButonu);
+
+      panel.add(scrollPane);
+      panel.repaint();
+    }
+    catch (SQLException ex){
+      throw new RuntimeException(ex);
+    }
+  }
+
   void OgrenciEkrani(Ogrenci ogrenci){
     panel.removeAll();
-    
+
     panel.repaint();
   }
 
@@ -639,6 +693,9 @@ public class App extends JFrame implements ActionListener, KeyListener {
       catch (SQLException ex){
         throw new RuntimeException(ex);
       }
+    }
+    if(e.getSource() == ogretmenOgrencileriListeleButonu){
+      OgretmenOgrencileriListele();
     }
   }
 
