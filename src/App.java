@@ -37,8 +37,9 @@ public class App extends JFrame implements ActionListener, KeyListener {
   JButton ogretmenTalepleriListeleButonu;
   JButton ogretmenOgrencileriListeleButonu;
   JButton ogretmenDersleriGoruntuleButonu;
-  JButton ogretmenTalepKabulEtButonu;
-  JButton ogretmenTalepReddetButonu;
+  JButton TalepKabulEtButonu;
+  JButton TalepReddetButonu;
+  JButton yoneticiTabloGeriButonu;
 
   JComboBox<String> yoneticiDurumComboBox;
 
@@ -187,11 +188,12 @@ public class App extends JFrame implements ActionListener, KeyListener {
     yoneticiIlgiAlaniEkleButonu.setSize(200, 60);
     yoneticiIlgiAlaniSilButonu = StandartGirisPaneliButonu("Sil", 885, 250);
     yoneticiIlgiAlaniSilButonu.setSize(200, 60);
-    ogretmenTalepKabulEtButonu = StandartGirisPaneliButonu("Kabul Et", 70, 500);
-    ogretmenTalepReddetButonu = StandartGirisPaneliButonu("Reddet", 70, 600);
+    TalepKabulEtButonu = StandartGirisPaneliButonu("Kabul Et", 70, 500);
+    TalepReddetButonu = StandartGirisPaneliButonu("Reddet", 70, 600);
     ogretmenTalepleriListeleButonu = StandartGirisPaneliButonu("Talepleri Listele", 70, 100);
     ogretmenOgrencileriListeleButonu = StandartGirisPaneliButonu("Ogrencileri Listele", 70, 200);
     ogretmenDersleriGoruntuleButonu = StandartGirisPaneliButonu("Dersleri Goruntule", 70, 300);
+    yoneticiTabloGeriButonu = StandartGirisPaneliButonu("Geri", 70, 100);
 
     yoneticiLoginButonu = StandartGirisPaneliButonu("Yonetici Olarak Gir", 450, 425);
     ogretmenLoginButonu = StandartGirisPaneliButonu("Ogretmen Olarak Gir", 450, 425);
@@ -371,9 +373,6 @@ public class App extends JFrame implements ActionListener, KeyListener {
   void OgretmenEkrani(Ogretmen ogretmen){
     panel.removeAll();
     this.ogretmen = ogretmen;
-    panel.add(ogretmenTalepleriListeleButonu);
-    panel.add(ogretmenOgrencileriListeleButonu);
-    panel.add(ogretmenDersleriGoruntuleButonu);
 
     OgretmenEkraniTalepListele(ogretmen);
 
@@ -400,9 +399,47 @@ public class App extends JFrame implements ActionListener, KeyListener {
       JScrollPane scrollPane = new JScrollPane(table);
       scrollPane.setBounds(450, 100, 600, 600);
 
+      panel.removeAll();
+
+      panel.add(ogretmenTalepleriListeleButonu);
+      panel.add(ogretmenOgrencileriListeleButonu);
+      panel.add(ogretmenDersleriGoruntuleButonu);
       panel.add(scrollPane);
-      panel.add(ogretmenTalepKabulEtButonu);
-      panel.add(ogretmenTalepReddetButonu);
+      panel.add(TalepKabulEtButonu);
+      panel.add(TalepReddetButonu);
+      panel.repaint();
+    }
+    catch (SQLException ex){
+      throw new RuntimeException(ex);
+    }
+  }
+
+  void YoneticiTalepleriListele(){
+    try {
+      Statement statement = connection.createStatement();
+      ResultSet resultSet = statement.executeQuery("SELECT * FROM anlasmalar");
+
+      DefaultTableModel model = new DefaultTableModel();
+      model.addColumn("Anlasma No");
+      model.addColumn("Ogrenci No");
+      model.addColumn("Ders");
+      model.addColumn("Durum");
+      while(resultSet.next()){
+        model.addRow(new Object[]{resultSet.getInt(1), resultSet.getInt(2), resultSet.getString(4), DersTalepDurumu.valueOf(resultSet.getString(8)).toString()});
+      }
+      table = new JTable(model);
+      table.setFont(mainFont);
+      table.setRowHeight(60);
+      JScrollPane scrollPane = new JScrollPane(table);
+      scrollPane.setBounds(450, 100, 600, 600);
+
+      panel.removeAll();
+
+      panel.add(scrollPane);
+      panel.add(yoneticiTabloGeriButonu);
+      panel.add(TalepKabulEtButonu);
+      panel.add(TalepReddetButonu);
+      panel.repaint();
     }
     catch (SQLException ex){
       throw new RuntimeException(ex);
@@ -496,16 +533,16 @@ public class App extends JFrame implements ActionListener, KeyListener {
 
   @Override
   public void actionPerformed(ActionEvent e) {
-    if(e.getSource()== yoneticiGirisEkraniButonu){
+    if(e.getSource() == yoneticiGirisEkraniButonu){
       YoneticiGirisEkrani();
     }
-    if(e.getSource()== ogretmenGirisEkraniButonu){
+    if(e.getSource() == ogretmenGirisEkraniButonu){
       OgretmenGirisEkrani();
     }
-    if(e.getSource()== ogrenciGirisEkraniButonu){
+    if(e.getSource() == ogrenciGirisEkraniButonu){
       OgrenciGirisEkrani();
     }
-    if(e.getSource()==anaGirisEkraniDon){
+    if(e.getSource() ==anaGirisEkraniDon){
       GirisEkrani();
     }
     if(e.getSource() == yoneticiLoginButonu){
@@ -600,10 +637,10 @@ public class App extends JFrame implements ActionListener, KeyListener {
         throw new RuntimeException(ex);
       }
     }
-    if(e.getSource()==yoneticiIlgiAlanlariListeleButonu){
+    if(e.getSource() == yoneticiIlgiAlanlariListeleButonu){
       IlgiAlanlariListeleEkrani();
     }
-    if(e.getSource()==yoneticiGeriButonu){
+    if(e.getSource() == yoneticiGeriButonu || e.getSource() == yoneticiTabloGeriButonu){
       YoneticiEkrani();
     }
     if(e.getSource() == yoneticiIlgiAlaniEkleButonu){
@@ -664,7 +701,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
     if(e.getSource() == ogretmenTalepleriListeleButonu){
       OgretmenEkraniTalepListele(this.ogretmen);
     }
-    if(e.getSource() == ogretmenTalepKabulEtButonu && table.getSelectedRow() != -1){
+    if(e.getSource() == TalepKabulEtButonu && table.getSelectedRow() != -1){
       try{
         PreparedStatement preparedStatement = connection.prepareStatement("UPDATE anlasmalar SET durum = ? WHERE anlasma_no = ?");
         preparedStatement.setObject(1, DersTalepDurumu.kabul, Types.OTHER);
@@ -679,7 +716,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
         throw new RuntimeException(ex);
       }
     }
-    if(e.getSource() == ogretmenTalepReddetButonu && table.getSelectedRow() != -1){
+    if(e.getSource() == TalepReddetButonu && table.getSelectedRow() != -1){
       try{
         PreparedStatement preparedStatement = connection.prepareStatement("UPDATE anlasmalar SET durum = ? WHERE anlasma_no = ?");
         preparedStatement.setObject(1, DersTalepDurumu.ret, Types.OTHER);
@@ -696,6 +733,9 @@ public class App extends JFrame implements ActionListener, KeyListener {
     }
     if(e.getSource() == ogretmenOgrencileriListeleButonu){
       OgretmenOgrencileriListele();
+    }
+    if(e.getSource() == yoneticiTalepleriListeleButonu){
+      YoneticiTalepleriListele();
     }
   }
 
