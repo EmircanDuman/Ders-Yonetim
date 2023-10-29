@@ -1,11 +1,9 @@
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 
 // KENDİ ÖĞRENCİ TRANSKRİPTİN İLE YAPMAN LAZIM
 
@@ -323,8 +321,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
           case rastgele -> yoneticiDurumComboBox.setSelectedIndex(1);
           case durdur -> yoneticiDurumComboBox.setSelectedIndex(2);
         }
-        if (resultSet.getBoolean(3)) ayniHocaMultCheckBox.setSelected(true);
-        else ayniHocaMultCheckBox.setSelected(false);
+        ayniHocaMultCheckBox.setSelected(resultSet.getBoolean(3));
 
         ayniDersMaksTalepSpinner.setValue(resultSet.getInt(4));
         talepMaksKarakterSpinner.setValue(resultSet.getInt(5));
@@ -396,7 +393,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
       while(resultSet.next()){
         model.addRow(new Object[]{resultSet.getInt(1), resultSet.getInt(2), resultSet.getString(4), DersTalepDurumu.valueOf(resultSet.getString(8)).toString()});
       }
-      JTable table = new JTable(model);
+      table = new JTable(model);
       table.setFont(mainFont);
       table.setRowHeight(60);
       JScrollPane scrollPane = new JScrollPane(table);
@@ -412,7 +409,9 @@ public class App extends JFrame implements ActionListener, KeyListener {
   }
 
   void OgrenciEkrani(Ogrenci ogrenci){
-
+    panel.removeAll();
+    
+    panel.repaint();
   }
 
   //--------------UI Bileşenlerini Panele Doldurma Alani Sonu
@@ -455,7 +454,6 @@ public class App extends JFrame implements ActionListener, KeyListener {
     if(e.getSource()==anaGirisEkraniDon){
       GirisEkrani();
     }
-
     if(e.getSource() == yoneticiLoginButonu){
       try {
         Statement statement = connection.createStatement();
@@ -530,7 +528,6 @@ public class App extends JFrame implements ActionListener, KeyListener {
           throw new RuntimeException(ex);
         }
       }
-
     if (e.getSource() == yoneticiParametreleriKaydetmeButonu){
       try {
         PreparedStatement preparedStatement = connection.prepareStatement("UPDATE public.parametreler " +
@@ -552,7 +549,6 @@ public class App extends JFrame implements ActionListener, KeyListener {
     if(e.getSource()==yoneticiIlgiAlanlariListeleButonu){
       IlgiAlanlariListeleEkrani();
     }
-
     if(e.getSource()==yoneticiGeriButonu){
       YoneticiEkrani();
     }
@@ -613,6 +609,36 @@ public class App extends JFrame implements ActionListener, KeyListener {
     }
     if(e.getSource() == ogretmenTalepleriListeleButonu){
       OgretmenEkraniTalepListele(this.ogretmen);
+    }
+    if(e.getSource() == ogretmenTalepKabulEtButonu && table.getSelectedRow() != -1){
+      try{
+        PreparedStatement preparedStatement = connection.prepareStatement("UPDATE anlasmalar SET durum = ? WHERE anlasma_no = ?");
+        preparedStatement.setObject(1, DersTalepDurumu.kabul, Types.OTHER);
+        preparedStatement.setInt(2, (Integer) table.getValueAt(table.getSelectedRow(), 1));
+        preparedStatement.executeUpdate();
+        table.setValueAt("kabul", table.getSelectedRow(), 3);
+
+        panel.repaint();
+        preparedStatement.close();
+      }
+      catch (SQLException ex){
+        throw new RuntimeException(ex);
+      }
+    }
+    if(e.getSource() == ogretmenTalepReddetButonu && table.getSelectedRow() != -1){
+      try{
+        PreparedStatement preparedStatement = connection.prepareStatement("UPDATE anlasmalar SET durum = ? WHERE anlasma_no = ?");
+        preparedStatement.setObject(1, DersTalepDurumu.ret, Types.OTHER);
+        preparedStatement.setInt(2, (Integer) table.getValueAt(table.getSelectedRow(), 1));
+        preparedStatement.executeUpdate();
+        table.setValueAt("ret", table.getSelectedRow(), 3);
+
+        panel.repaint();
+        preparedStatement.close();
+      }
+      catch (SQLException ex){
+        throw new RuntimeException(ex);
+      }
     }
   }
 
