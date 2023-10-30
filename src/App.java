@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.List;
 
 // KENDİ ÖĞRENCİ TRANSKRİPTİN İLE YAPMAN LAZIM
+// DERS VE İLGİ ALANLARİ SİLİNİRKEN HOCALARDAN DA SİLMEN LAZIM
 
 
 public class App extends JFrame implements ActionListener, KeyListener {
@@ -43,6 +44,8 @@ public class App extends JFrame implements ActionListener, KeyListener {
   JButton yoneticiDersleriListeleButonu;
   JButton yoneticiDersEkleButonu;
   JButton yoneticiDersSilButonu;
+  JButton ogretmenDersiAlButonu;
+  JButton ogretmenDersiBirakButonu;
 
   JComboBox<String> yoneticiDurumComboBox;
 
@@ -201,6 +204,9 @@ public class App extends JFrame implements ActionListener, KeyListener {
 
     TalepKabulEtButonu = StandartGirisPaneliButonu("Kabul Et", 70, 500);
     TalepReddetButonu = StandartGirisPaneliButonu("Reddet", 70, 600);
+
+    ogretmenDersiAlButonu = StandartGirisPaneliButonu("Dersi Al", 70, 500);
+    ogretmenDersiBirakButonu = StandartGirisPaneliButonu("Dersi Birak", 70, 600);
     ogretmenTalepleriListeleButonu = StandartGirisPaneliButonu("Talepleri Listele", 70, 100);
     ogretmenOgrencileriListeleButonu = StandartGirisPaneliButonu("Ogrencileri Listele", 70, 200);
     ogretmenDersleriGoruntuleButonu = StandartGirisPaneliButonu("Dersleri Goruntule", 70, 300);
@@ -546,6 +552,56 @@ public class App extends JFrame implements ActionListener, KeyListener {
     }
   }
 
+  void OgretmenDersleriGoruntule(Ogretmen ogretmen){
+    try{
+      PreparedStatement ogretmenPreparedStatement = connection.prepareStatement("SELECT dersler FROM hocalar WHERE sicil_no = ?");
+      ogretmenPreparedStatement.setInt(1, ogretmen.sicilNo);
+      Statement parametrelerStatement = connection.createStatement();
+
+      ResultSet ogretmenResultSet = ogretmenPreparedStatement.executeQuery();
+      ResultSet parametrelerResultSet = parametrelerStatement.executeQuery("SELECT dersler FROM parametreler WHERE id = 1");
+
+      DefaultTableModel model = new DefaultTableModel();
+      model.addColumn("Ders");
+      model.addColumn("Ders Durumu");
+
+      // OGRETMENIN ALIP ALMADIĞI DERSLERİ GOREBİLECEK BİR TABLO LAZIM
+      // DERS ADI | VAR/YOK
+
+      ogretmenResultSet.next();
+      parametrelerResultSet.next();
+
+      String[] ogretmenDersler = (String[]) ogretmenResultSet.getArray(1).getArray();
+      String[] parametreDersler = (String[]) parametrelerResultSet.getArray(1).getArray();
+
+      for (String ders : parametreDersler) {
+        if (Arrays.asList(ogretmenDersler).contains(ders)) {
+          model.addRow(new Object[]{ders, "Dersi Veriyor"});
+        } else {
+          model.addRow(new Object[]{ders, "Dersi Vermiyor"});
+        }
+      }
+
+      table = new JTable(model);
+      table.setFont(mainFont);
+      table.setRowHeight(60);
+      JScrollPane scrollPane = new JScrollPane(table);
+      scrollPane.setBounds(450, 100, 600, 600);
+
+      panel.removeAll();
+      panel.add(ogretmenTalepleriListeleButonu);
+      panel.add(ogretmenOgrencileriListeleButonu);
+      panel.add(ogretmenDersleriGoruntuleButonu);
+      panel.add(ogretmenDersiAlButonu);
+      panel.add(ogretmenDersiBirakButonu);
+      panel.add(scrollPane);
+      panel.repaint();
+    }
+    catch (SQLException ex){
+      throw new RuntimeException(ex);
+    }
+  }
+
   void OgrenciEkrani(Ogrenci ogrenci){
     panel.removeAll();
 
@@ -702,7 +758,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
             String[] strings = (String[]) resultSet.getArray(1).getArray();
             String[] strings1 = new String[strings.length + 1];
             System.arraycopy(strings, 0, strings1, 0, strings.length);
-            strings1[strings1.length - 1] = yoneticiIlgiAlaniEkleTextField.getText().toUpperCase();
+            strings1[strings1.length - 1] = yoneticiIlgiAlaniEkleTextField.getText().trim().toUpperCase();
             Array sqlArray = connection.createArrayOf("text", strings1);
             preparedStatement.setArray(1, sqlArray);
             preparedStatement.executeUpdate();
@@ -758,7 +814,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
             String[] strings = (String[]) resultSet.getArray(1).getArray();
             String[] strings1 = new String[strings.length + 1];
             System.arraycopy(strings, 0, strings1, 0, strings.length);
-            strings1[strings1.length - 1] = yoneticiDersEkleTextField.getText().toUpperCase();
+            strings1[strings1.length - 1] = yoneticiDersEkleTextField.getText().trim().toUpperCase();
             Array sqlArray = connection.createArrayOf("text", strings1);
             preparedStatement.setArray(1, sqlArray);
             preparedStatement.executeUpdate();
@@ -843,6 +899,75 @@ public class App extends JFrame implements ActionListener, KeyListener {
     }
     if (e.getSource() == yoneticiDersleriListeleButonu){
       DersleriListeleEkrani();
+    }
+    if(e.getSource() == ogretmenDersleriGoruntuleButonu){
+      OgretmenDersleriGoruntule(ogretmen);
+    }
+    if(e.getSource() == ogretmenDersiAlButonu){
+      try{
+        if(table.getSelectedRow() == -1) return;
+
+        PreparedStatement preparedStatement = connection.prepareStatement("UPDATE hocalar SET dersler = ? WHERE sicil_no = ?");
+        preparedStatement.setInt(2, ogretmen.sicilNo);
+
+        PreparedStatement preparedStatement1 = connection.prepareStatement("SELECT dersler FROM hocalar WHERE sicil_no = ?");
+        preparedStatement1.setInt(1, ogretmen.sicilNo);
+
+        ResultSet resultSet1 = preparedStatement1.executeQuery();
+        resultSet1.next();
+
+        String[] dizi = (String[]) resultSet1.getArray(1).getArray();
+        for (String eleman : dizi) {
+          if (eleman.equals(table.getValueAt(table.getSelectedRow(), 0))) {
+            return;
+          }
+        }
+
+        String[] strings = (String[]) resultSet1.getArray(1).getArray();
+
+        String[] strings1 = new String[strings.length + 1];
+        System.arraycopy(strings, 0, strings1, 0, strings.length);
+        strings1[strings1.length - 1] = (String) table.getValueAt(table.getSelectedRow(), 0);  //yoneticiDersEkleTextField.getText().trim().toUpperCase();
+        Array sqlArray = connection.createArrayOf("text", strings1);
+        preparedStatement.setArray(1, sqlArray);
+        preparedStatement.executeUpdate();
+
+        table.setValueAt("Dersi Veriyor", table.getSelectedRow(), 1);
+      }
+      catch (SQLException ex){
+        throw new RuntimeException(ex);
+      }
+    }
+    if(e.getSource() == ogretmenDersiBirakButonu && table.getSelectedRow() != -1){
+      try {
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT dersler FROM hocalar WHERE sicil_no = ?");
+        preparedStatement.setInt(1, ogretmen.sicilNo);
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        PreparedStatement preparedStatement1 = connection.prepareStatement("UPDATE hocalar SET dersler = ? WHERE sicil_no = ?");
+        preparedStatement1.setInt(2, ogretmen.sicilNo);
+
+        if (resultSet.next()){
+          String[] strings = (String[]) resultSet.getArray(1).getArray();
+
+          ArrayList<String> stringList = new ArrayList<>(Arrays.asList(strings));
+          stringList.remove(table.getValueAt(table.getSelectedRow(), 0));
+          strings = stringList.toArray(new String[0]);
+          Array sqlArray = connection.createArrayOf("text", strings);
+          preparedStatement1.setArray(1, sqlArray);
+          preparedStatement1.executeUpdate();
+
+          preparedStatement1.close();
+          preparedStatement.close();
+          resultSet.close();
+
+          table.setValueAt("Dersi Vermiyor", table.getSelectedRow(), 1);
+          panel.repaint();
+        }
+      }
+      catch (SQLException ex){
+        throw new RuntimeException(ex);
+      }
     }
   }
 
