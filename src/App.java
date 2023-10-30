@@ -364,7 +364,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
       ResultSet resultSet = statement.executeQuery("SELECT dersler FROM parametreler WHERE id = 1");
       if(resultSet.next()){
         DefaultTableModel model = new DefaultTableModel();
-        model.addColumn("Ilgi Alanlari");
+        model.addColumn("Dersler");
         for(String ilgiAlani : (String[]) resultSet.getArray(1).getArray()){
           model.addRow(new Object[]{ilgiAlani});
         }
@@ -794,6 +794,24 @@ public class App extends JFrame implements ActionListener, KeyListener {
           resultSet.close();
           preparedStatement.close();
 
+          Statement statement1 = connection.createStatement();
+          ResultSet resultSet1 = statement1.executeQuery("SELECT * FROM hocalar");
+          PreparedStatement preparedStatement1 = connection.prepareStatement("UPDATE hocalar SET ilgi_alanlari = ? WHERE sicil_no = ?");
+          while (resultSet1.next()){
+            String[] strings1 = (String[]) resultSet1.getArray(5).getArray();
+            ArrayList<String> stringList1 = new ArrayList<>(Arrays.asList(strings1));
+            stringList1.remove(table.getValueAt(table.getSelectedRow(), 0));
+            strings1 = stringList1.toArray(new String[0]);
+            Array sqlArray1 = connection.createArrayOf("text", strings);
+            preparedStatement1.setArray(1, sqlArray);
+            preparedStatement1.setInt(2, resultSet1.getInt(1));
+            preparedStatement1.executeUpdate();
+          }
+
+          statement1.close();
+          resultSet1.close();
+          preparedStatement1.close();
+
           IlgiAlanlariListeleEkrani();
         }
       }
@@ -849,6 +867,30 @@ public class App extends JFrame implements ActionListener, KeyListener {
           statement.close();
           resultSet.close();
           preparedStatement.close();
+
+          Statement statement1 = connection.createStatement();
+          ResultSet resultSet1 = statement1.executeQuery("SELECT * FROM hocalar");
+          PreparedStatement preparedStatement1 = connection.prepareStatement("UPDATE hocalar SET dersler = ? WHERE sicil_no = ?");
+          while (resultSet1.next()){
+            String[] strings1 = (String[]) resultSet1.getArray(5).getArray();
+            ArrayList<String> stringList1 = new ArrayList<>(Arrays.asList(strings1));
+            stringList1.remove(table.getValueAt(table.getSelectedRow(), 0));
+            strings1 = stringList1.toArray(new String[0]);
+            Array sqlArray1 = connection.createArrayOf("text", strings);
+            preparedStatement1.setArray(1, sqlArray);
+            preparedStatement1.setInt(2, resultSet1.getInt(1));
+            preparedStatement1.executeUpdate();
+          }
+
+          statement1.close();
+          resultSet1.close();
+          preparedStatement1.close();
+
+          PreparedStatement preparedStatement2 = connection.prepareStatement("DELETE FROM anlasmalar WHERE ders = ?");
+          preparedStatement2.setString(1, (String) table.getValueAt(table.getSelectedRow(), 0));
+          preparedStatement2.executeUpdate();
+
+          preparedStatement2.close();
 
           DersleriListeleEkrani();
         }
