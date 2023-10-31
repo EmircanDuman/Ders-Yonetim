@@ -50,6 +50,25 @@ public class App extends JFrame implements ActionListener, KeyListener {
   JButton ogretmenIlgiAlaniEkleButonu;
   JButton ogretmenIlgiAlaniSilButonu;
 
+  //ilgi alani ekrani
+  JButton ogrenciIlgiAlanlariButonu;
+  //kayıtlı ders yoksa pdf yükle
+  JButton ogrenciPDFYukleButonu;
+  //ders kaydı varsa görüntüle
+  JButton ogrenciDersleriGoruntuleButonu;
+  //ilgi alani ekraninda ekle
+  JButton ogrenciIlgiAlaniEkleButonu;
+  //ilgi alani ekraninda sil
+  JButton ogrenciIlgiAlaniSilButonu;
+  //talep seçip sonraki ekrana geç
+  JButton ogrenciTalepIleriButonu;
+  //talep olusturmaktan vazgeçersen geri gir
+  JButton ogrenciTalepGeriButonu;
+  //derste talep varsa silebilir
+  JButton ogrenciTalepSilButonu;
+  //ogrenci talebi yolla butonu
+  JButton ogrenciTalepGonderButonu;
+
   JComboBox<String> yoneticiDurumComboBox;
 
   JTable table;
@@ -729,7 +748,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
         throw new RuntimeException(ex);
       }
     }
-    if (e.getSource() == ogretmenLoginButonu) {
+    if(e.getSource() == ogretmenLoginButonu) {
       try {
         String[] adSoyadArray = ogretmenGirisIsimTextField.getText().trim().split("\\s+");
         if(adSoyadArray.length != 2){
@@ -757,7 +776,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
           throw new RuntimeException(ex);
         }
       }
-    if (e.getSource() == ogrenciLoginButonu) {
+    if(e.getSource() == ogrenciLoginButonu) {
       try {
         String[] adSoyadArray = ogrenciGirisIsimTextField.getText().trim().split("\\s+");
         if(adSoyadArray.length != 2){
@@ -783,7 +802,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
           throw new RuntimeException(ex);
         }
       }
-    if (e.getSource() == yoneticiParametreleriKaydetmeButonu){
+    if(e.getSource() == yoneticiParametreleriKaydetmeButonu){
       try {
         PreparedStatement preparedStatement = connection.prepareStatement("UPDATE public.parametreler " +
           "SET durum=?, ayni_hoca_mult=?, ayni_ders_mult=?, talep_maks_karakter=? " + "WHERE id = 1");
@@ -964,6 +983,15 @@ public class App extends JFrame implements ActionListener, KeyListener {
     }
     if(e.getSource() == TalepKabulEtButonu && table.getSelectedRow() != -1){
       try{
+        Statement stat = connection.createStatement();
+        ResultSet resset = stat.executeQuery("SELECT * FROM parametreler");
+        resset.next();
+        if(!TalepDurumu.valueOf(resset.getString(2)).equals(TalepDurumu.anlasma)){
+          JOptionPane.showMessageDialog(this, "Anlasma asamasi degil.");
+          return;
+        }
+        stat.close();
+        resset.close();
         PreparedStatement preparedStatement = connection.prepareStatement("UPDATE anlasmalar SET durum = ? WHERE anlasma_no = ?");
         preparedStatement.setObject(1, DersTalepDurumu.kabul, Types.OTHER);
         preparedStatement.setInt(2, (Integer) table.getValueAt(table.getSelectedRow(), 1));
@@ -979,6 +1007,15 @@ public class App extends JFrame implements ActionListener, KeyListener {
     }
     if(e.getSource() == TalepReddetButonu && table.getSelectedRow() != -1){
       try{
+        Statement stat = connection.createStatement();
+        ResultSet resset = stat.executeQuery("SELECT * FROM parametreler");
+        resset.next();
+        if(!TalepDurumu.valueOf(resset.getString(2)).equals(TalepDurumu.anlasma)){
+          JOptionPane.showMessageDialog(this, "Anlasma asamasi degil.");
+          return;
+        }
+        stat.close();
+        resset.close();
         PreparedStatement preparedStatement = connection.prepareStatement("UPDATE anlasmalar SET durum = ? WHERE anlasma_no = ?");
         preparedStatement.setObject(1, DersTalepDurumu.ret, Types.OTHER);
         preparedStatement.setInt(2, (Integer) table.getValueAt(table.getSelectedRow(), 1));
@@ -998,7 +1035,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
     if(e.getSource() == yoneticiTalepleriListeleButonu){
       YoneticiTalepleriListele();
     }
-    if (e.getSource() == yoneticiDersleriListeleButonu){
+    if(e.getSource() == yoneticiDersleriListeleButonu){
       DersleriListeleEkrani();
     }
     if(e.getSource() == ogretmenDersleriGoruntuleButonu){
