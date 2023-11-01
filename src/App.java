@@ -133,7 +133,6 @@ public class App extends JFrame implements ActionListener, KeyListener {
       this.ilgiAlanlari = ilgiAlanlari;
       this.genelNot = genelNot;
     }
-
   }
 
   private class Ogretmen{

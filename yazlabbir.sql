@@ -5,7 +5,7 @@
 -- Dumped from database version 16.0
 -- Dumped by pg_dump version 16.0
 
--- Started on 2023-10-19 19:42:31
+-- Started on 2023-11-01 18:41:05
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -20,15 +20,26 @@ SET row_security = off;
 
 --
 -- TOC entry 4 (class 2615 OID 2200)
--- Name: public; Type: SCHEMA; Schema: -; Owner: -
+-- Name: public; Type: SCHEMA; Schema: -; Owner: pg_database_owner
 --
 
 CREATE SCHEMA public;
 
 
+ALTER SCHEMA public OWNER TO pg_database_owner;
+
+--
+-- TOC entry 4847 (class 0 OID 0)
+-- Dependencies: 4
+-- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: pg_database_owner
+--
+
+COMMENT ON SCHEMA public IS 'standard public schema';
+
+
 --
 -- TOC entry 858 (class 1247 OID 16421)
--- Name: durumType; Type: TYPE; Schema: public; Owner: -
+-- Name: durumType; Type: TYPE; Schema: public; Owner: postgres
 --
 
 CREATE TYPE public."durumType" AS ENUM (
@@ -39,9 +50,11 @@ CREATE TYPE public."durumType" AS ENUM (
 );
 
 
+ALTER TYPE public."durumType" OWNER TO postgres;
+
 --
 -- TOC entry 873 (class 1247 OID 16467)
--- Name: gonderen; Type: TYPE; Schema: public; Owner: -
+-- Name: gonderen; Type: TYPE; Schema: public; Owner: postgres
 --
 
 CREATE TYPE public.gonderen AS ENUM (
@@ -50,9 +63,11 @@ CREATE TYPE public.gonderen AS ENUM (
 );
 
 
+ALTER TYPE public.gonderen OWNER TO postgres;
+
 --
 -- TOC entry 861 (class 1247 OID 16430)
--- Name: talepDurumlari; Type: TYPE; Schema: public; Owner: -
+-- Name: talepDurumlari; Type: TYPE; Schema: public; Owner: postgres
 --
 
 CREATE TYPE public."talepDurumlari" AS ENUM (
@@ -62,9 +77,15 @@ CREATE TYPE public."talepDurumlari" AS ENUM (
 );
 
 
+ALTER TYPE public."talepDurumlari" OWNER TO postgres;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
 --
 -- TOC entry 222 (class 1259 OID 16463)
--- Name: anlasmalar; Type: TABLE; Schema: public; Owner: -
+-- Name: anlasmalar; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.anlasmalar (
@@ -73,15 +94,17 @@ CREATE TABLE public.anlasmalar (
     ogretmen_no bigint NOT NULL,
     ders text NOT NULL,
     gonderen public.gonderen NOT NULL,
-    durum public."talepDurumlari" NOT NULL,
     ogrenci_mesaj text NOT NULL,
-    ogretmen_mesaj text NOT NULL
+    ogretmen_mesaj text NOT NULL,
+    durum public."durumType" NOT NULL
 );
 
 
+ALTER TABLE public.anlasmalar OWNER TO postgres;
+
 --
 -- TOC entry 223 (class 1259 OID 16471)
--- Name: anlasmalar_anlasma_no_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: anlasmalar_anlasma_no_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.anlasmalar_anlasma_no_seq
@@ -92,10 +115,12 @@ CREATE SEQUENCE public.anlasmalar_anlasma_no_seq
     CACHE 1;
 
 
+ALTER SEQUENCE public.anlasmalar_anlasma_no_seq OWNER TO postgres;
+
 --
--- TOC entry 4847 (class 0 OID 0)
+-- TOC entry 4848 (class 0 OID 0)
 -- Dependencies: 223
--- Name: anlasmalar_anlasma_no_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: anlasmalar_anlasma_no_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.anlasmalar_anlasma_no_seq OWNED BY public.anlasmalar.anlasma_no;
@@ -103,7 +128,7 @@ ALTER SEQUENCE public.anlasmalar_anlasma_no_seq OWNED BY public.anlasmalar.anlas
 
 --
 -- TOC entry 221 (class 1259 OID 16455)
--- Name: hocalar; Type: TABLE; Schema: public; Owner: -
+-- Name: hocalar; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.hocalar (
@@ -113,13 +138,15 @@ CREATE TABLE public.hocalar (
     soyad text NOT NULL,
     ilgi_alanlari text[],
     kontenjan_sayisi integer NOT NULL,
-    acilan_dersler text[]
+    dersler text[]
 );
 
 
+ALTER TABLE public.hocalar OWNER TO postgres;
+
 --
 -- TOC entry 220 (class 1259 OID 16454)
--- Name: hocalar_sicil_no_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: hocalar_sicil_no_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.hocalar_sicil_no_seq
@@ -130,10 +157,12 @@ CREATE SEQUENCE public.hocalar_sicil_no_seq
     CACHE 1;
 
 
+ALTER SEQUENCE public.hocalar_sicil_no_seq OWNER TO postgres;
+
 --
--- TOC entry 4848 (class 0 OID 0)
+-- TOC entry 4849 (class 0 OID 0)
 -- Dependencies: 220
--- Name: hocalar_sicil_no_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: hocalar_sicil_no_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.hocalar_sicil_no_seq OWNED BY public.hocalar.sicil_no;
@@ -141,7 +170,7 @@ ALTER SEQUENCE public.hocalar_sicil_no_seq OWNED BY public.hocalar.sicil_no;
 
 --
 -- TOC entry 225 (class 1259 OID 16491)
--- Name: kriter_formulleri_puanlari; Type: TABLE; Schema: public; Owner: -
+-- Name: kriter_formulleri_puanlari; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.kriter_formulleri_puanlari (
@@ -152,9 +181,11 @@ CREATE TABLE public.kriter_formulleri_puanlari (
 );
 
 
+ALTER TABLE public.kriter_formulleri_puanlari OWNER TO postgres;
+
 --
 -- TOC entry 224 (class 1259 OID 16490)
--- Name: kriter_formulleri_puanlari_kriter_no_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: kriter_formulleri_puanlari_kriter_no_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.kriter_formulleri_puanlari_kriter_no_seq
@@ -165,10 +196,12 @@ CREATE SEQUENCE public.kriter_formulleri_puanlari_kriter_no_seq
     CACHE 1;
 
 
+ALTER SEQUENCE public.kriter_formulleri_puanlari_kriter_no_seq OWNER TO postgres;
+
 --
--- TOC entry 4849 (class 0 OID 0)
+-- TOC entry 4850 (class 0 OID 0)
 -- Dependencies: 224
--- Name: kriter_formulleri_puanlari_kriter_no_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: kriter_formulleri_puanlari_kriter_no_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.kriter_formulleri_puanlari_kriter_no_seq OWNED BY public.kriter_formulleri_puanlari.kriter_no;
@@ -176,7 +209,7 @@ ALTER SEQUENCE public.kriter_formulleri_puanlari_kriter_no_seq OWNED BY public.k
 
 --
 -- TOC entry 217 (class 1259 OID 16408)
--- Name: notlar; Type: TABLE; Schema: public; Owner: -
+-- Name: notlar; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.notlar (
@@ -187,9 +220,11 @@ CREATE TABLE public.notlar (
 );
 
 
+ALTER TABLE public.notlar OWNER TO postgres;
+
 --
 -- TOC entry 216 (class 1259 OID 16400)
--- Name: ogrenciler; Type: TABLE; Schema: public; Owner: -
+-- Name: ogrenciler; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.ogrenciler (
@@ -203,9 +238,11 @@ CREATE TABLE public.ogrenciler (
 );
 
 
+ALTER TABLE public.ogrenciler OWNER TO postgres;
+
 --
 -- TOC entry 215 (class 1259 OID 16399)
--- Name: ogrenciler_ogrenci_no_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: ogrenciler_ogrenci_no_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.ogrenciler_ogrenci_no_seq
@@ -216,10 +253,12 @@ CREATE SEQUENCE public.ogrenciler_ogrenci_no_seq
     CACHE 1;
 
 
+ALTER SEQUENCE public.ogrenciler_ogrenci_no_seq OWNER TO postgres;
+
 --
--- TOC entry 4850 (class 0 OID 0)
+-- TOC entry 4851 (class 0 OID 0)
 -- Dependencies: 215
--- Name: ogrenciler_ogrenci_no_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: ogrenciler_ogrenci_no_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.ogrenciler_ogrenci_no_seq OWNED BY public.ogrenciler.ogrenci_no;
@@ -227,7 +266,7 @@ ALTER SEQUENCE public.ogrenciler_ogrenci_no_seq OWNED BY public.ogrenciler.ogren
 
 --
 -- TOC entry 227 (class 1259 OID 16505)
--- Name: ornek_ogrenci; Type: TABLE; Schema: public; Owner: -
+-- Name: ornek_ogrenci; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.ornek_ogrenci (
@@ -238,9 +277,11 @@ CREATE TABLE public.ornek_ogrenci (
 );
 
 
+ALTER TABLE public.ornek_ogrenci OWNER TO postgres;
+
 --
 -- TOC entry 226 (class 1259 OID 16504)
--- Name: ornek_ogrenci_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: ornek_ogrenci_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.ornek_ogrenci_id_seq
@@ -251,10 +292,12 @@ CREATE SEQUENCE public.ornek_ogrenci_id_seq
     CACHE 1;
 
 
+ALTER SEQUENCE public.ornek_ogrenci_id_seq OWNER TO postgres;
+
 --
--- TOC entry 4851 (class 0 OID 0)
+-- TOC entry 4852 (class 0 OID 0)
 -- Dependencies: 226
--- Name: ornek_ogrenci_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: ornek_ogrenci_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.ornek_ogrenci_id_seq OWNED BY public.ornek_ogrenci.id;
@@ -262,7 +305,7 @@ ALTER SEQUENCE public.ornek_ogrenci_id_seq OWNED BY public.ornek_ogrenci.id;
 
 --
 -- TOC entry 219 (class 1259 OID 16443)
--- Name: parametreler; Type: TABLE; Schema: public; Owner: -
+-- Name: parametreler; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.parametreler (
@@ -272,13 +315,16 @@ CREATE TABLE public.parametreler (
     ayni_ders_mult integer DEFAULT 1 NOT NULL,
     talep_maks_karakter integer DEFAULT 100 NOT NULL,
     ilgi_alanlari text[] NOT NULL,
-    admin_sifresi text NOT NULL
+    admin_sifresi text NOT NULL,
+    dersler text[] NOT NULL
 );
 
 
+ALTER TABLE public.parametreler OWNER TO postgres;
+
 --
 -- TOC entry 218 (class 1259 OID 16442)
--- Name: parametreler_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: parametreler_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.parametreler_id_seq
@@ -289,10 +335,12 @@ CREATE SEQUENCE public.parametreler_id_seq
     CACHE 1;
 
 
+ALTER SEQUENCE public.parametreler_id_seq OWNER TO postgres;
+
 --
--- TOC entry 4852 (class 0 OID 0)
+-- TOC entry 4853 (class 0 OID 0)
 -- Dependencies: 218
--- Name: parametreler_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: parametreler_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.parametreler_id_seq OWNED BY public.parametreler.id;
@@ -300,7 +348,7 @@ ALTER SEQUENCE public.parametreler_id_seq OWNED BY public.parametreler.id;
 
 --
 -- TOC entry 4678 (class 2604 OID 16472)
--- Name: anlasmalar anlasma_no; Type: DEFAULT; Schema: public; Owner: -
+-- Name: anlasmalar anlasma_no; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.anlasmalar ALTER COLUMN anlasma_no SET DEFAULT nextval('public.anlasmalar_anlasma_no_seq'::regclass);
@@ -308,7 +356,7 @@ ALTER TABLE ONLY public.anlasmalar ALTER COLUMN anlasma_no SET DEFAULT nextval('
 
 --
 -- TOC entry 4677 (class 2604 OID 16458)
--- Name: hocalar sicil_no; Type: DEFAULT; Schema: public; Owner: -
+-- Name: hocalar sicil_no; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.hocalar ALTER COLUMN sicil_no SET DEFAULT nextval('public.hocalar_sicil_no_seq'::regclass);
@@ -316,7 +364,7 @@ ALTER TABLE ONLY public.hocalar ALTER COLUMN sicil_no SET DEFAULT nextval('publi
 
 --
 -- TOC entry 4679 (class 2604 OID 16494)
--- Name: kriter_formulleri_puanlari kriter_no; Type: DEFAULT; Schema: public; Owner: -
+-- Name: kriter_formulleri_puanlari kriter_no; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.kriter_formulleri_puanlari ALTER COLUMN kriter_no SET DEFAULT nextval('public.kriter_formulleri_puanlari_kriter_no_seq'::regclass);
@@ -324,7 +372,7 @@ ALTER TABLE ONLY public.kriter_formulleri_puanlari ALTER COLUMN kriter_no SET DE
 
 --
 -- TOC entry 4672 (class 2604 OID 16403)
--- Name: ogrenciler ogrenci_no; Type: DEFAULT; Schema: public; Owner: -
+-- Name: ogrenciler ogrenci_no; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.ogrenciler ALTER COLUMN ogrenci_no SET DEFAULT nextval('public.ogrenciler_ogrenci_no_seq'::regclass);
@@ -332,7 +380,7 @@ ALTER TABLE ONLY public.ogrenciler ALTER COLUMN ogrenci_no SET DEFAULT nextval('
 
 --
 -- TOC entry 4680 (class 2604 OID 16508)
--- Name: ornek_ogrenci id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: ornek_ogrenci id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.ornek_ogrenci ALTER COLUMN id SET DEFAULT nextval('public.ornek_ogrenci_id_seq'::regclass);
@@ -340,7 +388,7 @@ ALTER TABLE ONLY public.ornek_ogrenci ALTER COLUMN id SET DEFAULT nextval('publi
 
 --
 -- TOC entry 4673 (class 2604 OID 16446)
--- Name: parametreler id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: parametreler id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.parametreler ALTER COLUMN id SET DEFAULT nextval('public.parametreler_id_seq'::regclass);
@@ -348,7 +396,7 @@ ALTER TABLE ONLY public.parametreler ALTER COLUMN id SET DEFAULT nextval('public
 
 --
 -- TOC entry 4690 (class 2606 OID 16479)
--- Name: anlasmalar anlasmalar_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: anlasmalar anlasmalar_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.anlasmalar
@@ -357,7 +405,7 @@ ALTER TABLE ONLY public.anlasmalar
 
 --
 -- TOC entry 4688 (class 2606 OID 16462)
--- Name: hocalar hocalar_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: hocalar hocalar_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.hocalar
@@ -366,7 +414,7 @@ ALTER TABLE ONLY public.hocalar
 
 --
 -- TOC entry 4692 (class 2606 OID 16498)
--- Name: kriter_formulleri_puanlari kriter_formulleri_puanlari_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: kriter_formulleri_puanlari kriter_formulleri_puanlari_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.kriter_formulleri_puanlari
@@ -375,7 +423,7 @@ ALTER TABLE ONLY public.kriter_formulleri_puanlari
 
 --
 -- TOC entry 4684 (class 2606 OID 16414)
--- Name: notlar notlar_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: notlar notlar_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.notlar
@@ -384,7 +432,7 @@ ALTER TABLE ONLY public.notlar
 
 --
 -- TOC entry 4682 (class 2606 OID 16407)
--- Name: ogrenciler ogrenciler_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: ogrenciler ogrenciler_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.ogrenciler
@@ -393,7 +441,7 @@ ALTER TABLE ONLY public.ogrenciler
 
 --
 -- TOC entry 4694 (class 2606 OID 16512)
--- Name: ornek_ogrenci ornek_ogrenci_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: ornek_ogrenci ornek_ogrenci_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.ornek_ogrenci
@@ -402,7 +450,7 @@ ALTER TABLE ONLY public.ornek_ogrenci
 
 --
 -- TOC entry 4686 (class 2606 OID 16453)
--- Name: parametreler parametreler_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: parametreler parametreler_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.parametreler
@@ -411,7 +459,7 @@ ALTER TABLE ONLY public.parametreler
 
 --
 -- TOC entry 4696 (class 2606 OID 16480)
--- Name: anlasmalar anlasmalar_ogrenci_no_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: anlasmalar anlasmalar_ogrenci_no_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.anlasmalar
@@ -420,7 +468,7 @@ ALTER TABLE ONLY public.anlasmalar
 
 --
 -- TOC entry 4697 (class 2606 OID 16485)
--- Name: anlasmalar anlasmalar_ogretmen_no_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: anlasmalar anlasmalar_ogretmen_no_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.anlasmalar
@@ -429,7 +477,7 @@ ALTER TABLE ONLY public.anlasmalar
 
 --
 -- TOC entry 4698 (class 2606 OID 16499)
--- Name: kriter_formulleri_puanlari kriter_formulleri_puanlari_hoca_no_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: kriter_formulleri_puanlari kriter_formulleri_puanlari_hoca_no_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.kriter_formulleri_puanlari
@@ -438,14 +486,14 @@ ALTER TABLE ONLY public.kriter_formulleri_puanlari
 
 --
 -- TOC entry 4695 (class 2606 OID 16415)
--- Name: notlar notlar_ogrenci_no_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: notlar notlar_ogrenci_no_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.notlar
     ADD CONSTRAINT notlar_ogrenci_no_fkey FOREIGN KEY (ogrenci_no) REFERENCES public.ogrenciler(ogrenci_no) NOT VALID;
 
 
--- Completed on 2023-10-19 19:42:32
+-- Completed on 2023-11-01 18:41:05
 
 --
 -- PostgreSQL database dump complete
