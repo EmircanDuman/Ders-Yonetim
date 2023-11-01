@@ -117,7 +117,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
   //---------------------------------------------UI BİLEŞENLERİ TANIMLAMA ALANI SON
 
   //---------------------------------------------PRIVATE CLASS ALANI SONU
-  private class Ogrenci{
+  private static class Ogrenci{
     public Integer no;
     public String ad;
     public String soyad;
@@ -135,7 +135,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
     }
   }
 
-  private class Ogretmen{
+  private static class Ogretmen{
     public Integer sicilNo;
     public String ad;
     public String soyad;
@@ -247,7 +247,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
     ayniHocaMultCheckBox.setBounds(60, 218, 400, 60);
     ayniHocaMultCheckBox.setFont(mainFont);
 
-    yoneticiDurumComboBox = new JComboBox<String>(new String[]{"anlasma", "rastgele", "durdur"});
+    yoneticiDurumComboBox = new JComboBox<>(new String[]{"anlasma", "rastgele", "durdur"});
     yoneticiDurumComboBox.setBounds(80, 84, 300, 60);
     yoneticiDurumComboBox.setFont(mainFont);
     yoneticiDurumComboBox.setBackground(Color.white);
@@ -763,9 +763,9 @@ public class App extends JFrame implements ActionListener, KeyListener {
 
         if (resultSet.next()) {
           OgretmenEkrani(new Ogretmen(resultSet.getInt(1), resultSet.getString(3),
-          resultSet.getString(4), resultSet.getString(2),
-          (String[]) resultSet.getArray(5).getArray(), resultSet.getInt(6),
-          (String[]) resultSet.getArray(7).getArray()));
+                  resultSet.getString(4), resultSet.getString(2),
+                  (String[]) resultSet.getArray(5).getArray(), resultSet.getInt(6),
+                  (String[]) resultSet.getArray(7).getArray()));
         } else {
           JOptionPane.showMessageDialog(this, "Giris basarisiz.");
         }
@@ -790,8 +790,8 @@ public class App extends JFrame implements ActionListener, KeyListener {
 
         if (resultSet.next()) {
           OgrenciEkrani(new Ogrenci(resultSet.getInt(1), resultSet.getString(3),
-          resultSet.getString(4), resultSet.getString(2),
-          (String[]) resultSet.getArray(5).getArray(), resultSet.getFloat(7)));
+                  resultSet.getString(4), resultSet.getString(2),
+                  (String[]) resultSet.getArray(5).getArray(), resultSet.getFloat(7)));
         } else {
           JOptionPane.showMessageDialog(this, "Giris basarisiz.");
         }
@@ -881,8 +881,8 @@ public class App extends JFrame implements ActionListener, KeyListener {
             ArrayList<String> stringList1 = new ArrayList<>(Arrays.asList(strings1));
             stringList1.remove(table.getValueAt(table.getSelectedRow(), 0));
             strings1 = stringList1.toArray(new String[0]);
-            Array sqlArray1 = connection.createArrayOf("text", strings);
-            preparedStatement1.setArray(1, sqlArray);
+            Array sqlArray1 = connection.createArrayOf("text", strings1);
+            preparedStatement1.setArray(1, sqlArray1);
             preparedStatement1.setInt(2, resultSet1.getInt(1));
             preparedStatement1.executeUpdate();
           }
@@ -954,8 +954,8 @@ public class App extends JFrame implements ActionListener, KeyListener {
             ArrayList<String> stringList1 = new ArrayList<>(Arrays.asList(strings1));
             stringList1.remove(table.getValueAt(table.getSelectedRow(), 0));
             strings1 = stringList1.toArray(new String[0]);
-            Array sqlArray1 = connection.createArrayOf("text", strings);
-            preparedStatement1.setArray(1, sqlArray);
+            Array sqlArray1 = connection.createArrayOf("text", strings1);
+            preparedStatement1.setArray(1, sqlArray1);
             preparedStatement1.setInt(2, resultSet1.getInt(1));
             preparedStatement1.executeUpdate();
           }
