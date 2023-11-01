@@ -305,25 +305,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
 
   void OgrenciEkrani(Ogrenci ogrenci){
     this.ogrenci = ogrenci;
-    try{
-      panel.removeAll();
-
-      panel.add(ogrenciIlgiAlanlariButonu);
-
-      //OGRENCİ DERS KAYDI VAR İSE DERSLERİ GORUNTULE YOKSA PDF YUKLE BUTONU
-      PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM notlar WHERE ogrenci_no = ?");
-      preparedStatement.setInt(1, ogrenci.no);
-      ResultSet resultSet = preparedStatement.executeQuery();
-      if(resultSet.next()) panel.add(ogrenciDersleriGoruntuleButonu);
-      else panel.add(ogrenciPDFYukleButonu);
-
-      OgrenciIlgiAlaniGoruntule();
-
-      panel.repaint();
-    }
-    catch (SQLException ex){
-      throw new RuntimeException(ex);
-    }
+    OgrenciIlgiAlaniGoruntule();
   }
 
   void OgrenciIlgiAlaniGoruntule(){
@@ -358,9 +340,21 @@ public class App extends JFrame implements ActionListener, KeyListener {
       table.setRowHeight(60);
       JScrollPane scrollPane = new JScrollPane(table);
       scrollPane.setBounds(450, 100, 600, 600);
+      panel.removeAll();
+
+      //OGRENCİ DERS KAYDI VAR İSE DERSLERİ GORUNTULE YOKSA PDF YUKLE BUTONU
+      PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM notlar WHERE ogrenci_no = ?");
+      preparedStatement.setInt(1, ogrenci.no);
+      ResultSet resultSet = preparedStatement.executeQuery();
+      if(resultSet.next()) panel.add(ogrenciDersleriGoruntuleButonu);
+      else panel.add(ogrenciPDFYukleButonu);
+
       panel.add(scrollPane);
+      panel.add(ogrenciIlgiAlanlariButonu);
       panel.add(ogrenciIlgiAlaniEkleButonu);
       panel.add(ogrenciIlgiAlaniSilButonu);
+
+      panel.repaint();
     }
     catch (SQLException ex){
       throw new RuntimeException(ex);
@@ -370,6 +364,102 @@ public class App extends JFrame implements ActionListener, KeyListener {
   void OgrenciDersleriGoruntule(){
     // TÜM HOCALARI AL, İLGİ ALANI UYANLARI AYIKLA, DERSTE TALEP VAR MI DİYE KONTROL ET
     // İLERİ BUTONU EKLE, TALEP VAR İSE SİLEBİLME BUTONU EKLE
+    try{
+
+      JScrollPane scrollPane = new JScrollPane();
+
+      Statement ogretmenStatement = connection.createStatement();
+      ResultSet ogretmenResultSet = ogretmenStatement.executeQuery("SELECT * FROM hocalar");
+
+      PreparedStatement ogrenciPreparedStatement = connection.prepareStatement("SELECT * FROM ogrenciler WHERE ogrenci_no = ?");
+      ogrenciPreparedStatement.setInt(1, ogrenci.no);
+
+      ResultSet ogrenciResultSet = ogrenciPreparedStatement.executeQuery();
+      ogrenciResultSet.next();
+
+      List<String> ogrenciIlgiList = Arrays.asList((String[]) ogrenciResultSet.getArray(5).getArray());
+
+      DefaultTableModel model = new DefaultTableModel();
+      model.addColumn("Ogretmen No");
+      model.addColumn("Ad Soyad");
+      model.addColumn("Ders Adı");
+      model.addColumn("Talep Durumu");
+      model.addColumn("Ilgi Alanlari");
+
+      while (ogretmenResultSet.next()){
+        List<String> ogretmenIlgiList = Arrays.asList((String[]) ogretmenResultSet.getArray(5).getArray());
+        for(String ilgiAlani : ogretmenIlgiList){
+
+          //İLGİ ALANLARI UYUMLU
+          if(ogrenciIlgiList.contains(ilgiAlani)){
+
+            String[] ogretmenDersArray = (String[]) ogretmenResultSet.getArray(5).getArray();
+
+            for(String ders : ogretmenDersArray){
+              PreparedStatement miniPPS = connection.prepareStatement("SELECT * FROM anlasmalar WHERE ogrenci_no = ? AND ogretmen_no = ? AND ders = ?");
+              miniPPS.setInt(1, ogrenci.no);
+              miniPPS.setInt(2, ogretmenResultSet.getInt(1));
+              miniPPS.setString(3, ders);
+              ResultSet miniRS = miniPPS.executeQuery();
+              //BÖYLE BİR DERS ANLASMASI VAR MI? VAR İSE 2 İF YOKSA AYRI
+              if(miniRS.next()){
+
+                switch (DersTalepDurumu.valueOf(miniRS.getString(8))){
+                  case ret -> {
+                    model.addRow(new Object[]{ogretmenResultSet.getInt(1), (String)(ogretmenResultSet.getString(3)+" "+ogretmenResultSet.getString(4))
+                            , ders, "Ret", String.join(", ", (String[])ogretmenResultSet.getArray(5).getArray())});
+                  }
+                  case kabul -> {
+                    model.addRow(new Object[]{ogretmenResultSet.getInt(1), (String)(ogretmenResultSet.getString(3)+" "+ogretmenResultSet.getString(4))
+                            , ders, "Kabul", String.join(", ", (String[])ogretmenResultSet.getArray(5).getArray())});
+                  }
+                  case beklemede -> {
+                    model.addRow(new Object[]{ogretmenResultSet.getInt(1), (String)(ogretmenResultSet.getString(3)+" "+ogretmenResultSet.getString(4))
+                            , ders, "Beklemede", String.join(", ", (String[])ogretmenResultSet.getArray(5).getArray())});
+                  }
+                  case iptal -> {
+                    model.addRow(new Object[]{ogretmenResultSet.getInt(1), (String)(ogretmenResultSet.getString(3)+" "+ogretmenResultSet.getString(4))
+                            , ders, "Iptal", String.join(", ", (String[])ogretmenResultSet.getArray(5).getArray())});
+                  }
+
+                }
+              }
+              else {
+                model.addRow(new Object[]{ogretmenResultSet.getInt(1), (String)(ogretmenResultSet.getString(3)+" "+ogretmenResultSet.getString(4))
+                        , ders, "Talep Yok", String.join(", ", (String[])ogretmenResultSet.getArray(5).getArray())});
+              }
+              table = new JTable(model);
+              table.setRowHeight(60);
+              table.setFont(mainFont);
+
+
+              scrollPane.add(table);
+              scrollPane.setBounds(450, 100, 600, 600);
+
+            }
+          }
+        }
+      }
+      panel.removeAll();
+      panel.add(scrollPane);
+      panel.add(ogrenciIlgiAlanlariButonu);
+
+      //OGRENCİ DERS KAYDI VAR İSE DERSLERİ GORUNTULE YOKSA PDF YUKLE BUTONU
+      PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM notlar WHERE ogrenci_no = ?");
+      preparedStatement.setInt(1, ogrenci.no);
+      ResultSet resultSet = preparedStatement.executeQuery();
+      if(resultSet.next()){
+        panel.add(ogrenciDersleriGoruntuleButonu);
+        panel.add(ogrenciTalepIleriButonu);
+        panel.add(ogrenciTalepSilButonu);
+      }
+      else panel.add(ogrenciPDFYukleButonu);
+
+      panel.repaint();
+    }
+    catch (SQLException ex){
+      throw new RuntimeException(ex);
+    }
   }
 
   void GirisEkrani() {
@@ -1249,6 +1339,9 @@ public class App extends JFrame implements ActionListener, KeyListener {
         throw new RuntimeException(ex);
       }
     }
+    if(e.getSource() == ogrenciIlgiAlanlariButonu){
+      OgrenciIlgiAlaniGoruntule();
+    }
     if(e.getSource() == ogrenciIlgiAlaniEkleButonu){
       try{
         if(table.getSelectedRow() == -1) return;
@@ -1314,6 +1407,9 @@ public class App extends JFrame implements ActionListener, KeyListener {
       catch (SQLException ex){
         throw new RuntimeException(ex);
       }
+    }
+    if(e.getSource() == ogrenciDersleriGoruntuleButonu){
+      OgrenciDersleriGoruntule();
     }
   }
 
