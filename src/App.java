@@ -6,9 +6,6 @@ import java.sql.*;
 import java.util.*;
 import java.util.List;
 
-// KENDİ ÖĞRENCİ TRANSKRİPTİN İLE YAPMAN LAZIM
-// DERS VE İLGİ ALANLARİ SİLİNİRKEN HOCALARDAN DA SİLMEN LAZIM
-
 
 public class App extends JFrame implements ActionListener, KeyListener {
 
@@ -49,24 +46,14 @@ public class App extends JFrame implements ActionListener, KeyListener {
   JButton ogretmenIlgiAlanlariListeleButonu;
   JButton ogretmenIlgiAlaniEkleButonu;
   JButton ogretmenIlgiAlaniSilButonu;
-
-  //ilgi alani ekrani
   JButton ogrenciIlgiAlanlariButonu;
-  //kayıtlı ders yoksa pdf yükle
   JButton ogrenciPDFYukleButonu;
-  //ders kaydı varsa görüntüle
   JButton ogrenciDersleriGoruntuleButonu;
-  //ilgi alani ekraninda ekle
   JButton ogrenciIlgiAlaniEkleButonu;
-  //ilgi alani ekraninda sil
   JButton ogrenciIlgiAlaniSilButonu;
-  //talep seçip sonraki ekrana geç
   JButton ogrenciTalepIleriButonu;
-  //talep olusturmaktan vazgeçersen geri gir
   JButton ogrenciTalepGeriButonu;
-  //derste talep varsa silebilir
   JButton ogrenciTalepSilButonu;
-  //ogrenci talebi yolla butonu
   JButton ogrenciTalepGonderButonu;
 
   JComboBox<String> yoneticiDurumComboBox;
@@ -342,7 +329,6 @@ public class App extends JFrame implements ActionListener, KeyListener {
       scrollPane.setBounds(450, 100, 600, 600);
       panel.removeAll();
 
-      //OGRENCİ DERS KAYDI VAR İSE DERSLERİ GORUNTULE YOKSA PDF YUKLE BUTONU
       PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM notlar WHERE ogrenci_no = ?");
       preparedStatement.setInt(1, ogrenci.no);
       ResultSet resultSet = preparedStatement.executeQuery();
@@ -362,10 +348,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
   }
 
   void OgrenciDersleriGoruntule(){
-    // TÜM HOCALARI AL, İLGİ ALANI UYANLARI AYIKLA, DERSTE TALEP VAR MI DİYE KONTROL ET
-    // İLERİ BUTONU EKLE, TALEP VAR İSE SİLEBİLME BUTONU EKLE
     try{
-
       JScrollPane scrollPane = new JScrollPane();
 
       Statement ogretmenStatement = connection.createStatement();
@@ -386,65 +369,63 @@ public class App extends JFrame implements ActionListener, KeyListener {
       model.addColumn("Talep Durumu");
       model.addColumn("Ilgi Alanlari");
 
-      while (ogretmenResultSet.next()){
+      while(ogretmenResultSet.next()){
+
         List<String> ogretmenIlgiList = Arrays.asList((String[]) ogretmenResultSet.getArray(5).getArray());
-        for(String ilgiAlani : ogretmenIlgiList){
+        List<String> copyOfOgrenciIlgiList = new ArrayList<>(ogrenciIlgiList);
+        copyOfOgrenciIlgiList.retainAll(ogretmenIlgiList);
 
-          //İLGİ ALANLARI UYUMLU
-          if(ogrenciIlgiList.contains(ilgiAlani)){
+        if (!copyOfOgrenciIlgiList.isEmpty()){
 
-            String[] ogretmenDersArray = (String[]) ogretmenResultSet.getArray(5).getArray();
+          String[] ogretmenDersArray = (String[]) ogretmenResultSet.getArray(5).getArray();
 
-            for(String ders : ogretmenDersArray){
-              PreparedStatement miniPPS = connection.prepareStatement("SELECT * FROM anlasmalar WHERE ogrenci_no = ? AND ogretmen_no = ? AND ders = ?");
-              miniPPS.setInt(1, ogrenci.no);
-              miniPPS.setInt(2, ogretmenResultSet.getInt(1));
-              miniPPS.setString(3, ders);
-              ResultSet miniRS = miniPPS.executeQuery();
-              //BÖYLE BİR DERS ANLASMASI VAR MI? VAR İSE 2 İF YOKSA AYRI
-              if(miniRS.next()){
+          for(String ders : ogretmenDersArray){
+            PreparedStatement miniPPS = connection.prepareStatement("SELECT * FROM anlasmalar WHERE ogrenci_no = ? AND ogretmen_no = ? AND ders = ?");
+            miniPPS.setInt(1, ogrenci.no);
+            miniPPS.setInt(2, ogretmenResultSet.getInt(1));
+            miniPPS.setString(3, ders);
+            ResultSet miniRS = miniPPS.executeQuery();
 
-                switch (DersTalepDurumu.valueOf(miniRS.getString(8))){
-                  case ret -> {
-                    model.addRow(new Object[]{ogretmenResultSet.getInt(1), (String)(ogretmenResultSet.getString(3)+" "+ogretmenResultSet.getString(4))
-                            , ders, "Ret", String.join(", ", (String[])ogretmenResultSet.getArray(5).getArray())});
-                  }
-                  case kabul -> {
-                    model.addRow(new Object[]{ogretmenResultSet.getInt(1), (String)(ogretmenResultSet.getString(3)+" "+ogretmenResultSet.getString(4))
-                            , ders, "Kabul", String.join(", ", (String[])ogretmenResultSet.getArray(5).getArray())});
-                  }
-                  case beklemede -> {
-                    model.addRow(new Object[]{ogretmenResultSet.getInt(1), (String)(ogretmenResultSet.getString(3)+" "+ogretmenResultSet.getString(4))
-                            , ders, "Beklemede", String.join(", ", (String[])ogretmenResultSet.getArray(5).getArray())});
-                  }
-                  case iptal -> {
-                    model.addRow(new Object[]{ogretmenResultSet.getInt(1), (String)(ogretmenResultSet.getString(3)+" "+ogretmenResultSet.getString(4))
-                            , ders, "Iptal", String.join(", ", (String[])ogretmenResultSet.getArray(5).getArray())});
-                  }
-
+            if(miniRS.next()){
+              System.out.println("Anlasma: "+miniRS.getInt(1)+ " Durum: "+ DersTalepDurumu.valueOf(miniRS.getString(8)));
+              switch (DersTalepDurumu.valueOf(miniRS.getString(8))){
+                case ret -> {
+                  model.addRow(new Object[]{ogretmenResultSet.getInt(1), (String)(ogretmenResultSet.getString(3)+" "+ogretmenResultSet.getString(4))
+                          , ders, "Ret", String.join(", ", (String[])ogretmenResultSet.getArray(5).getArray())});
+                }
+                case kabul -> {
+                  model.addRow(new Object[]{ogretmenResultSet.getInt(1), (String)(ogretmenResultSet.getString(3)+" "+ogretmenResultSet.getString(4))
+                          , ders, "Kabul", String.join(", ", (String[])ogretmenResultSet.getArray(5).getArray())});
+                }
+                case beklemede -> {
+                  model.addRow(new Object[]{ogretmenResultSet.getInt(1), (String)(ogretmenResultSet.getString(3)+" "+ogretmenResultSet.getString(4))
+                          , ders, "Beklemede", String.join(", ", (String[])ogretmenResultSet.getArray(5).getArray())});
+                }
+                case iptal -> {
+                  model.addRow(new Object[]{ogretmenResultSet.getInt(1), (String)(ogretmenResultSet.getString(3)+" "+ogretmenResultSet.getString(4))
+                          , ders, "Iptal", String.join(", ", (String[])ogretmenResultSet.getArray(5).getArray())});
                 }
               }
-              else {
-                model.addRow(new Object[]{ogretmenResultSet.getInt(1), (String)(ogretmenResultSet.getString(3)+" "+ogretmenResultSet.getString(4))
-                        , ders, "Talep Yok", String.join(", ", (String[])ogretmenResultSet.getArray(5).getArray())});
-              }
-              table = new JTable(model);
-              table.setRowHeight(60);
-              table.setFont(mainFont);
-
-
-              scrollPane.add(table);
-              scrollPane.setBounds(450, 100, 600, 600);
-
+            }
+            else {
+              model.addRow(new Object[]{ogretmenResultSet.getInt(1), (String)(ogretmenResultSet.getString(3)+" "+ogretmenResultSet.getString(4))
+                      , ders, "Talep Yok", String.join(", ", (String[])ogretmenResultSet.getArray(5).getArray())});
             }
           }
         }
       }
+      table = new JTable(model);
+      table.setRowHeight(60);
+      table.setFont(mainFont);
+
+      scrollPane.getViewport().add(table);
+
+      scrollPane.setBounds(450, 100, 600, 600);
+
       panel.removeAll();
       panel.add(scrollPane);
       panel.add(ogrenciIlgiAlanlariButonu);
 
-      //OGRENCİ DERS KAYDI VAR İSE DERSLERİ GORUNTULE YOKSA PDF YUKLE BUTONU
       PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM notlar WHERE ogrenci_no = ?");
       preparedStatement.setInt(1, ogrenci.no);
       ResultSet resultSet = preparedStatement.executeQuery();
@@ -504,12 +485,6 @@ public class App extends JFrame implements ActionListener, KeyListener {
     panel.add(ogrenciLoginButonu);
     panel.repaint();
   }
-
-  // Talep durumu / aynı hoca mult / ayni ders mult / talep maks karakter / ilgi alanlari
-  // Öğrenciler listelenmeli / detaylı seceneği / düzenleme / ilgi alanlari belirleme
-  // Öğretmenler listelenmeli / detaylı seçeneği / düzenleme / dersleri açma
-  // rastgele öğrenci olusturma
-  // tüm öğrenci ve hocalari silme ? ya da öyle bir şey
 
   void YoneticiEkrani(){
     panel.removeAll();
@@ -762,9 +737,6 @@ public class App extends JFrame implements ActionListener, KeyListener {
       model.addColumn("Ders");
       model.addColumn("Ders Durumu");
 
-      // OGRETMENIN ALIP ALMADIĞI DERSLERİ GOREBİLECEK BİR TABLO LAZIM
-      // DERS ADI | VAR/YOK
-
       ogretmenResultSet.next();
       parametrelerResultSet.next();
 
@@ -812,9 +784,6 @@ public class App extends JFrame implements ActionListener, KeyListener {
       DefaultTableModel model = new DefaultTableModel();
       model.addColumn("Ilgi Alani");
       model.addColumn("Ilgi Alani Durumu");
-
-      // OGRETMENIN ALIP ALMADIĞI DERSLERİ GOREBİLECEK BİR TABLO LAZIM
-      // DERS ADI | VAR/YOK
 
       ogretmenResultSet.next();
       parametrelerResultSet.next();
@@ -1228,7 +1197,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
 
         String[] strings1 = new String[strings.length + 1];
         System.arraycopy(strings, 0, strings1, 0, strings.length);
-        strings1[strings1.length - 1] = (String) table.getValueAt(table.getSelectedRow(), 0);  //yoneticiDersEkleTextField.getText().trim().toUpperCase();
+        strings1[strings1.length - 1] = (String) table.getValueAt(table.getSelectedRow(), 0);
         Array sqlArray = connection.createArrayOf("text", strings1);
         preparedStatement.setArray(1, sqlArray);
         preparedStatement.executeUpdate();
@@ -1297,7 +1266,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
 
         String[] strings1 = new String[strings.length + 1];
         System.arraycopy(strings, 0, strings1, 0, strings.length);
-        strings1[strings1.length - 1] = (String) table.getValueAt(table.getSelectedRow(), 0);  //yoneticiDersEkleTextField.getText().trim().toUpperCase();
+        strings1[strings1.length - 1] = (String) table.getValueAt(table.getSelectedRow(), 0);
         Array sqlArray = connection.createArrayOf("text", strings1);
         preparedStatement.setArray(1, sqlArray);
         preparedStatement.executeUpdate();
@@ -1366,7 +1335,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
 
         String[] strings1 = new String[strings.length + 1];
         System.arraycopy(strings, 0, strings1, 0, strings.length);
-        strings1[strings1.length - 1] = (String) table.getValueAt(table.getSelectedRow(), 0);  //yoneticiDersEkleTextField.getText().trim().toUpperCase();
+        strings1[strings1.length - 1] = (String) table.getValueAt(table.getSelectedRow(), 0);
         Array sqlArray = connection.createArrayOf("text", strings1);
         preparedStatement.setArray(1, sqlArray);
         preparedStatement.executeUpdate();
