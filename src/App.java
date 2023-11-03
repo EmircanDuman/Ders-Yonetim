@@ -51,10 +51,8 @@ public class App extends JFrame implements ActionListener, KeyListener {
   JButton ogrenciDersleriGoruntuleButonu;
   JButton ogrenciIlgiAlaniEkleButonu;
   JButton ogrenciIlgiAlaniSilButonu;
-  JButton ogrenciTalepIleriButonu;
-  JButton ogrenciTalepGeriButonu;
-  JButton ogrenciTalepSilButonu;
   JButton ogrenciTalepGonderButonu;
+  JButton ogrenciTalepSilButonu;
 
   JComboBox<String> yoneticiDurumComboBox;
 
@@ -230,9 +228,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
     ogrenciPDFYukleButonu = StandartGirisPaneliButonu("PDF Yukle", 70, 200);
     ogrenciIlgiAlaniEkleButonu = StandartGirisPaneliButonu("Ilgi Alani Ekle", 70, 500);
     ogrenciIlgiAlaniSilButonu = StandartGirisPaneliButonu("Ilgi Alani Sil", 70, 600);
-    ogrenciTalepIleriButonu = StandartGirisPaneliButonu("Ileri", 70, 500);
-    ogrenciTalepGeriButonu = StandartGirisPaneliButonu("Geri", 70, 600);
-    ogrenciTalepGonderButonu = StandartGirisPaneliButonu("Gonder", 70, 500);
+    ogrenciTalepGonderButonu = StandartGirisPaneliButonu("Talep Gonder", 70, 500);
     ogrenciTalepSilButonu = StandartGirisPaneliButonu("Talep Sil", 70, 600);
 
     yoneticiLoginButonu = StandartGirisPaneliButonu("Yonetici Olarak Gir", 450, 425);
@@ -387,7 +383,6 @@ public class App extends JFrame implements ActionListener, KeyListener {
             ResultSet miniRS = miniPPS.executeQuery();
 
             if(miniRS.next()){
-              System.out.println("Anlasma: "+miniRS.getInt(1)+ " Durum: "+ DersTalepDurumu.valueOf(miniRS.getString(8)));
               switch (DersTalepDurumu.valueOf(miniRS.getString(8))){
                 case ret -> {
                   model.addRow(new Object[]{ogretmenResultSet.getInt(1), (String)(ogretmenResultSet.getString(3)+" "+ogretmenResultSet.getString(4))
@@ -431,7 +426,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
       ResultSet resultSet = preparedStatement.executeQuery();
       if(resultSet.next()){
         panel.add(ogrenciDersleriGoruntuleButonu);
-        panel.add(ogrenciTalepIleriButonu);
+        panel.add(ogrenciTalepGonderButonu);
         panel.add(ogrenciTalepSilButonu);
       }
       else panel.add(ogrenciPDFYukleButonu);
@@ -1379,6 +1374,34 @@ public class App extends JFrame implements ActionListener, KeyListener {
     }
     if(e.getSource() == ogrenciDersleriGoruntuleButonu){
       OgrenciDersleriGoruntule();
+    }
+    if(e.getSource() == ogrenciTalepGonderButonu && table.getSelectedRow() != -1 && table.getValueAt(table.getSelectedRow(), 3).equals("Talep Yok")){
+      try{
+        PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO public.anlasmalar(" +
+                "ogrenci_no, ogretmen_no, ders, gonderen, ogrenci_mesaj, ogretmen_mesaj, durum) " +
+                "VALUES (?, ?, ?, 'ogrenci', '', '', 'beklemede')");
+        preparedStatement.setInt(1, ogrenci.no);
+        preparedStatement.setInt(2, (int)table.getValueAt(table.getSelectedRow(), 0));
+        preparedStatement.setString(3, (String) table.getValueAt(table.getSelectedRow(), 2));
+        preparedStatement.executeUpdate();
+        table.setValueAt("Beklemede", table.getSelectedRow(), 3);
+      }
+      catch (SQLException ex){
+        throw new RuntimeException(ex);
+      }
+    }
+    if(e.getSource() == ogrenciTalepSilButonu && table.getSelectedRow() != -1 && (table.getValueAt(table.getSelectedRow(), 3).equals("Beklemede") || table.getValueAt(table.getSelectedRow(), 3).equals("Ret"))){
+      try {
+        PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM anlasmalar WHERE ogretmen_no = ? AND ogrenci_no = ? AND ders = ?");
+        preparedStatement.setInt(1, (int)table.getValueAt(table.getSelectedRow(), 0));
+        preparedStatement.setInt(2, ogrenci.no);
+        preparedStatement.setString(3, (String)table.getValueAt(table.getSelectedRow(), 2));
+        preparedStatement.executeUpdate();
+        table.setValueAt("Talep Yok", table.getSelectedRow(), 3);
+      }
+      catch (SQLException ex){
+        throw new RuntimeException(ex);
+      }
     }
   }
 
