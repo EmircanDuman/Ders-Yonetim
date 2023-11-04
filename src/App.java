@@ -1,4 +1,4 @@
-import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.*;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 
@@ -8,12 +8,12 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.*;
 import java.util.*;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class App extends JFrame implements ActionListener, KeyListener {
@@ -1426,8 +1426,23 @@ public class App extends JFrame implements ActionListener, KeyListener {
           PDDocument pdfDDocument = Loader.loadPDF(file);
           PDFTextStripper pdfTextStripper = new PDFTextStripper();
           String docText = pdfTextStripper.getText(pdfDDocument);
-          System.out.println(docText);
-          System.out.println(pdfDDocument.getPages().getCount());
+          //System.out.println(docText);
+
+          //String regexPattern = "([A-Z]{3}[0-9]{3})\s(.*?)\s\(.*?\)\nZ\sTr\s[0-9]\s[0-9]\s[0-9]\s[0-9]\s[0-9A-Z]{3}\s\s";
+          String regexPattern = "[A-Z]{3}[0-9]{3}\\s.*\\r\\n|[\\r\\n]\\(.+\\)[\\r\\n]\\d+ Tr \\d{4} \\d{2}[A-Z]{2} [A-Z]";
+          Pattern pattern = Pattern.compile(regexPattern);
+          Matcher matcher = pattern.matcher(docText);
+
+          List<String> matches = new ArrayList<>();
+
+          while (matcher.find()) {
+            String match = matcher.group();
+            matches.add(match);
+          }
+
+          for (String match : matches) {
+            System.out.println(match);
+          }
 
           pdfDDocument.close();
         } catch (IOException ex) {
