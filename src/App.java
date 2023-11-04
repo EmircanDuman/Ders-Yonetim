@@ -1,7 +1,16 @@
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
+
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.*;
 import java.util.*;
 import java.util.List;
@@ -1401,6 +1410,31 @@ public class App extends JFrame implements ActionListener, KeyListener {
       }
       catch (SQLException ex){
         throw new RuntimeException(ex);
+      }
+    }
+    if(e.getSource() == ogrenciPDFYukleButonu){
+      JFileChooser fileChooser = new JFileChooser();
+      fileChooser.setFileFilter(new FileNameExtensionFilter("PDF Dosyaları", "pdf"));
+
+      int result = fileChooser.showOpenDialog(null);
+
+      if (result == JFileChooser.APPROVE_OPTION) {
+        try {
+          String selectedFilePath = fileChooser.getSelectedFile().getAbsolutePath();
+          File file = new File(selectedFilePath);
+
+          PDDocument pdfDDocument = Loader.loadPDF(file);
+          PDFTextStripper pdfTextStripper = new PDFTextStripper();
+          String docText = pdfTextStripper.getText(pdfDDocument);
+          System.out.println(docText);
+          System.out.println(pdfDDocument.getPages().getCount());
+
+          pdfDDocument.close();
+        } catch (IOException ex) {
+          throw new RuntimeException(ex);
+        }
+      } else {
+        System.out.println("Dosya seçilmedi.");
       }
     }
   }
