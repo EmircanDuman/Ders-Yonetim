@@ -18,6 +18,8 @@ import java.util.regex.Pattern;
 
 public class App extends JFrame implements ActionListener, KeyListener {
 
+  //OGRENCİ NOT GORUNTULE EKRANI, STATEMENTLAR VE RESULTSETLER KAPAT
+
   //---------------------------------------------UI BİLEŞENLERİ TANIMLAMA ALANI
 
   static String connectionURL = "jdbc:postgresql://localhost:5432/yazlab1?user=postgres&password=0000";
@@ -62,6 +64,8 @@ public class App extends JFrame implements ActionListener, KeyListener {
   JButton ogrenciIlgiAlaniSilButonu;
   JButton ogrenciTalepGonderButonu;
   JButton ogrenciTalepSilButonu;
+  JButton ogrenciNotlariGoruntuleButonu;
+  JButton ogrenciNotlariSilButonu;
 
   JComboBox<String> yoneticiDurumComboBox;
 
@@ -235,8 +239,10 @@ public class App extends JFrame implements ActionListener, KeyListener {
     ogrenciIlgiAlanlariButonu = StandartGirisPaneliButonu("Ilgi Alanlari", 70, 100);
     ogrenciDersleriGoruntuleButonu = StandartGirisPaneliButonu("Dersleri Goruntule", 70, 200);
     ogrenciPDFYukleButonu = StandartGirisPaneliButonu("PDF Yukle", 70, 200);
+    ogrenciNotlariGoruntuleButonu = StandartGirisPaneliButonu("Notları Goruntule", 70, 300);
     ogrenciIlgiAlaniEkleButonu = StandartGirisPaneliButonu("Ilgi Alani Ekle", 70, 500);
     ogrenciIlgiAlaniSilButonu = StandartGirisPaneliButonu("Ilgi Alani Sil", 70, 600);
+    ogrenciNotlariSilButonu = StandartGirisPaneliButonu("Notlari Sil", 70, 500);
     ogrenciTalepGonderButonu = StandartGirisPaneliButonu("Talep Gonder", 70, 500);
     ogrenciTalepSilButonu = StandartGirisPaneliButonu("Talep Sil", 70, 600);
 
@@ -337,13 +343,23 @@ public class App extends JFrame implements ActionListener, KeyListener {
       PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM notlar WHERE ogrenci_no = ?");
       preparedStatement.setInt(1, ogrenci.no);
       ResultSet resultSet = preparedStatement.executeQuery();
-      if(resultSet.next()) panel.add(ogrenciDersleriGoruntuleButonu);
+      if(resultSet.next()){
+        panel.add(ogrenciDersleriGoruntuleButonu);
+        panel.add(ogrenciNotlariGoruntuleButonu);
+      }
       else panel.add(ogrenciPDFYukleButonu);
 
       panel.add(scrollPane);
       panel.add(ogrenciIlgiAlanlariButonu);
       panel.add(ogrenciIlgiAlaniEkleButonu);
       panel.add(ogrenciIlgiAlaniSilButonu);
+
+      ogrenciPreparedStatement.close();
+      parametrelerStatement.close();
+      ogrenciResultSet.close();
+      parametrelerResultSet.close();
+      preparedStatement.close();
+      resultSet.close();
 
       panel.repaint();
     }
@@ -382,7 +398,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
 
         if (!copyOfOgrenciIlgiList.isEmpty()){
 
-          String[] ogretmenDersArray = (String[]) ogretmenResultSet.getArray(5).getArray();
+          String[] ogretmenDersArray = (String[]) ogretmenResultSet.getArray(7).getArray();
 
           for(String ders : ogretmenDersArray){
             PreparedStatement miniPPS = connection.prepareStatement("SELECT * FROM anlasmalar WHERE ogrenci_no = ? AND ogretmen_no = ? AND ders = ?");
@@ -393,28 +409,22 @@ public class App extends JFrame implements ActionListener, KeyListener {
 
             if(miniRS.next()){
               switch (DersTalepDurumu.valueOf(miniRS.getString(8))){
-                case ret -> {
-                  model.addRow(new Object[]{ogretmenResultSet.getInt(1), (String)(ogretmenResultSet.getString(3)+" "+ogretmenResultSet.getString(4))
-                          , ders, "Ret", String.join(", ", (String[])ogretmenResultSet.getArray(5).getArray())});
-                }
-                case kabul -> {
-                  model.addRow(new Object[]{ogretmenResultSet.getInt(1), (String)(ogretmenResultSet.getString(3)+" "+ogretmenResultSet.getString(4))
-                          , ders, "Kabul", String.join(", ", (String[])ogretmenResultSet.getArray(5).getArray())});
-                }
-                case beklemede -> {
-                  model.addRow(new Object[]{ogretmenResultSet.getInt(1), (String)(ogretmenResultSet.getString(3)+" "+ogretmenResultSet.getString(4))
-                          , ders, "Beklemede", String.join(", ", (String[])ogretmenResultSet.getArray(5).getArray())});
-                }
-                case iptal -> {
-                  model.addRow(new Object[]{ogretmenResultSet.getInt(1), (String)(ogretmenResultSet.getString(3)+" "+ogretmenResultSet.getString(4))
-                          , ders, "Iptal", String.join(", ", (String[])ogretmenResultSet.getArray(5).getArray())});
-                }
+                case ret -> model.addRow(new Object[]{ogretmenResultSet.getInt(1), ogretmenResultSet.getString(3)+" "+ogretmenResultSet.getString(4)
+                        , ders, "Ret", String.join(", ", (String[])ogretmenResultSet.getArray(5).getArray())});
+                case kabul -> model.addRow(new Object[]{ogretmenResultSet.getInt(1), ogretmenResultSet.getString(3)+" "+ogretmenResultSet.getString(4)
+                        , ders, "Kabul", String.join(", ", (String[])ogretmenResultSet.getArray(5).getArray())});
+                case beklemede -> model.addRow(new Object[]{ogretmenResultSet.getInt(1), ogretmenResultSet.getString(3)+" "+ogretmenResultSet.getString(4)
+                        , ders, "Beklemede", String.join(", ", (String[])ogretmenResultSet.getArray(5).getArray())});
+                case iptal -> model.addRow(new Object[]{ogretmenResultSet.getInt(1), ogretmenResultSet.getString(3)+" "+ogretmenResultSet.getString(4)
+                        , ders, "Iptal", String.join(", ", (String[])ogretmenResultSet.getArray(5).getArray())});
               }
             }
             else {
-              model.addRow(new Object[]{ogretmenResultSet.getInt(1), (String)(ogretmenResultSet.getString(3)+" "+ogretmenResultSet.getString(4))
+              model.addRow(new Object[]{ogretmenResultSet.getInt(1), ogretmenResultSet.getString(3)+" "+ogretmenResultSet.getString(4)
                       , ders, "Talep Yok", String.join(", ", (String[])ogretmenResultSet.getArray(5).getArray())});
             }
+            miniPPS.close();
+            miniRS.close();
           }
         }
       }
@@ -435,10 +445,57 @@ public class App extends JFrame implements ActionListener, KeyListener {
       ResultSet resultSet = preparedStatement.executeQuery();
       if(resultSet.next()){
         panel.add(ogrenciDersleriGoruntuleButonu);
+        panel.add(ogrenciNotlariGoruntuleButonu);
         panel.add(ogrenciTalepGonderButonu);
         panel.add(ogrenciTalepSilButonu);
       }
       else panel.add(ogrenciPDFYukleButonu);
+
+      ogretmenStatement.close();
+      ogretmenResultSet.close();
+      ogrenciPreparedStatement.close();
+      ogrenciResultSet.close();
+      preparedStatement.close();
+      resultSet.close();
+
+      panel.repaint();
+    }
+    catch (SQLException ex){
+      throw new RuntimeException(ex);
+    }
+  }
+
+  void OgrenciNotlariGoruntule(){
+    try {
+      PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM notlar WHERE ogrenci_no = ?");
+      preparedStatement.setInt(1, ogrenci.no);
+      ResultSet resultSet = preparedStatement.executeQuery();
+      DefaultTableModel model = new DefaultTableModel();
+      model.addColumn("Ders");
+      model.addColumn("Not");
+      while (resultSet.next()){
+        model.addRow(new Object[]{resultSet.getString(2), resultSet.getString(3)});
+      }
+
+      table = new JTable(model);
+      table.setRowHeight(60);
+      table.setFont(mainFont);
+
+      JScrollPane scrollPane = new JScrollPane();
+      scrollPane.getViewport().add(table);
+
+      scrollPane.setBounds(450, 100, 600, 600);
+
+      panel.removeAll();
+
+      panel.add(ogrenciIlgiAlanlariButonu);
+      panel.add(ogrenciDersleriGoruntuleButonu);
+      panel.add(ogrenciNotlariGoruntuleButonu);
+      panel.add(scrollPane);
+      panel.add(ogrenciNotlariSilButonu);
+
+      preparedStatement.close();
+      resultSet.close();
 
       panel.repaint();
     }
@@ -634,6 +691,10 @@ public class App extends JFrame implements ActionListener, KeyListener {
       panel.add(scrollPane);
       panel.add(TalepKabulEtButonu);
       panel.add(TalepReddetButonu);
+
+      preparedStatement.close();
+      resultSet.close();
+
       panel.repaint();
     }
     catch (SQLException ex){
@@ -667,6 +728,10 @@ public class App extends JFrame implements ActionListener, KeyListener {
       panel.add(yoneticiTabloGeriButonu);
       panel.add(TalepKabulEtButonu);
       panel.add(TalepReddetButonu);
+
+      statement.close();
+      resultSet.close();
+
       panel.repaint();
     }
     catch (SQLException ex){
@@ -769,6 +834,12 @@ public class App extends JFrame implements ActionListener, KeyListener {
       panel.add(ogretmenDersiAlButonu);
       panel.add(ogretmenDersiBirakButonu);
       panel.add(scrollPane);
+
+      ogretmenPreparedStatement.close();
+      parametrelerStatement.close();
+      ogretmenResultSet.close();
+      parametrelerResultSet.close();
+
       panel.repaint();
     }
     catch (SQLException ex){
@@ -817,6 +888,12 @@ public class App extends JFrame implements ActionListener, KeyListener {
       panel.add(ogretmenIlgiAlaniEkleButonu);
       panel.add(ogretmenIlgiAlaniSilButonu);
       panel.add(scrollPane);
+
+      ogretmenPreparedStatement.close();
+      parametrelerStatement.close();
+      ogretmenResultSet.close();
+      parametrelerResultSet.close();
+
       panel.repaint();
     }
     catch (SQLException ex){
@@ -979,14 +1056,13 @@ public class App extends JFrame implements ActionListener, KeyListener {
             preparedStatement.setArray(1, sqlArray);
             preparedStatement.executeUpdate();
 
-            preparedStatement.close();
-            statement.close();
-            resultSet.close();
-
             yoneticiIlgiAlaniEkleTextField.setText("");
             IlgiAlanlariListeleEkrani();
           }
+          statement.close();
+          resultSet.close();
         }
+        preparedStatement.close();
       } catch (SQLException ex) {
         throw new RuntimeException(ex);
       }
@@ -1005,10 +1081,6 @@ public class App extends JFrame implements ActionListener, KeyListener {
           Array sqlArray = connection.createArrayOf("text", strings);
           preparedStatement.setArray(1, sqlArray);
           preparedStatement.executeUpdate();
-
-          statement.close();
-          resultSet.close();
-          preparedStatement.close();
 
           Statement statement1 = connection.createStatement();
           ResultSet resultSet1 = statement1.executeQuery("SELECT * FROM hocalar");
@@ -1030,6 +1102,9 @@ public class App extends JFrame implements ActionListener, KeyListener {
 
           IlgiAlanlariListeleEkrani();
         }
+        statement.close();
+        resultSet.close();
+        preparedStatement.close();
       }
       catch (SQLException ex){
         throw new RuntimeException(ex);
@@ -1052,14 +1127,13 @@ public class App extends JFrame implements ActionListener, KeyListener {
             preparedStatement.setArray(1, sqlArray);
             preparedStatement.executeUpdate();
 
-            preparedStatement.close();
-            statement.close();
-            resultSet.close();
-
             yoneticiDersEkleTextField.setText("");
             DersleriListeleEkrani();
           }
+          statement.close();
+          resultSet.close();
         }
+        preparedStatement.close();
       } catch (SQLException ex) {
         throw new RuntimeException(ex);
       }
@@ -1078,10 +1152,6 @@ public class App extends JFrame implements ActionListener, KeyListener {
           Array sqlArray = connection.createArrayOf("text", strings);
           preparedStatement.setArray(1, sqlArray);
           preparedStatement.executeUpdate();
-
-          statement.close();
-          resultSet.close();
-          preparedStatement.close();
 
           Statement statement1 = connection.createStatement();
           ResultSet resultSet1 = statement1.executeQuery("SELECT * FROM hocalar");
@@ -1109,6 +1179,9 @@ public class App extends JFrame implements ActionListener, KeyListener {
 
           DersleriListeleEkrani();
         }
+        statement.close();
+        resultSet.close();
+        preparedStatement.close();
       }
       catch (SQLException ex){
         throw new RuntimeException(ex);
@@ -1126,16 +1199,18 @@ public class App extends JFrame implements ActionListener, KeyListener {
           JOptionPane.showMessageDialog(this, "Anlasma asamasi degil.");
           return;
         }
-        stat.close();
-        resset.close();
+
         PreparedStatement preparedStatement = connection.prepareStatement("UPDATE anlasmalar SET durum = ? WHERE anlasma_no = ?");
         preparedStatement.setObject(1, DersTalepDurumu.kabul, Types.OTHER);
-        preparedStatement.setInt(2, (Integer) table.getValueAt(table.getSelectedRow(), 1));
+        preparedStatement.setInt(2, (Integer) table.getValueAt(table.getSelectedRow(), 0));
         preparedStatement.executeUpdate();
-        table.setValueAt("kabul", table.getSelectedRow(), 4);
+        table.setValueAt("Kabul", table.getSelectedRow(), 4);
+
+        stat.close();
+        resset.close();
+        preparedStatement.close();
 
         panel.repaint();
-        preparedStatement.close();
       }
       catch (SQLException ex){
         throw new RuntimeException(ex);
@@ -1150,16 +1225,17 @@ public class App extends JFrame implements ActionListener, KeyListener {
           JOptionPane.showMessageDialog(this, "Anlasma asamasi degil.");
           return;
         }
-        stat.close();
-        resset.close();
         PreparedStatement preparedStatement = connection.prepareStatement("UPDATE anlasmalar SET durum = ? WHERE anlasma_no = ?");
         preparedStatement.setObject(1, DersTalepDurumu.ret, Types.OTHER);
-        preparedStatement.setInt(2, (Integer) table.getValueAt(table.getSelectedRow(), 1));
+        preparedStatement.setInt(2, (Integer) table.getValueAt(table.getSelectedRow(), 0));
         preparedStatement.executeUpdate();
-        table.setValueAt("ret", table.getSelectedRow(), 4);
+        table.setValueAt("Ret", table.getSelectedRow(), 4);
+
+        stat.close();
+        resset.close();
+        preparedStatement.close();
 
         panel.repaint();
-        preparedStatement.close();
       }
       catch (SQLException ex){
         throw new RuntimeException(ex);
@@ -1207,6 +1283,10 @@ public class App extends JFrame implements ActionListener, KeyListener {
         preparedStatement.executeUpdate();
 
         table.setValueAt("Dersi Veriyor", table.getSelectedRow(), 1);
+
+        preparedStatement.close();
+        preparedStatement1.close();
+        resultSet1.close();
       }
       catch (SQLException ex){
         throw new RuntimeException(ex);
@@ -1231,13 +1311,12 @@ public class App extends JFrame implements ActionListener, KeyListener {
           preparedStatement1.setArray(1, sqlArray);
           preparedStatement1.executeUpdate();
 
-          preparedStatement1.close();
-          preparedStatement.close();
-          resultSet.close();
-
           table.setValueAt("Dersi Vermiyor", table.getSelectedRow(), 1);
           panel.repaint();
         }
+        preparedStatement.close();
+        resultSet.close();
+        preparedStatement1.close();
       }
       catch (SQLException ex){
         throw new RuntimeException(ex);
@@ -1276,10 +1355,15 @@ public class App extends JFrame implements ActionListener, KeyListener {
         preparedStatement.executeUpdate();
 
         table.setValueAt("Dahil", table.getSelectedRow(), 1);
+
+        preparedStatement.close();
+        preparedStatement1.close();
+        resultSet1.close();
       }
       catch (SQLException ex){
         throw new RuntimeException(ex);
       }
+
     }
     if(e.getSource() == ogretmenIlgiAlaniSilButonu && table.getSelectedRow() != -1){
       try {
@@ -1300,13 +1384,12 @@ public class App extends JFrame implements ActionListener, KeyListener {
           preparedStatement1.setArray(1, sqlArray);
           preparedStatement1.executeUpdate();
 
-          preparedStatement1.close();
-          preparedStatement.close();
-          resultSet.close();
-
           table.setValueAt("Dahil Degil", table.getSelectedRow(), 1);
           panel.repaint();
         }
+        preparedStatement.close();
+        resultSet.close();
+        preparedStatement1.close();
       }
       catch (SQLException ex){
         throw new RuntimeException(ex);
@@ -1345,6 +1428,10 @@ public class App extends JFrame implements ActionListener, KeyListener {
         preparedStatement.executeUpdate();
 
         table.setValueAt("Dahil", table.getSelectedRow(), 1);
+
+        preparedStatement.close();
+        preparedStatement1.close();
+        resultSet1.close();
       }
       catch (SQLException ex){
         throw new RuntimeException(ex);
@@ -1369,13 +1456,13 @@ public class App extends JFrame implements ActionListener, KeyListener {
           preparedStatement1.setArray(1, sqlArray);
           preparedStatement1.executeUpdate();
 
-          preparedStatement1.close();
-          preparedStatement.close();
-          resultSet.close();
 
           table.setValueAt("Dahil Degil", table.getSelectedRow(), 1);
           panel.repaint();
         }
+        preparedStatement.close();
+        resultSet.close();
+        preparedStatement1.close();
       }
       catch (SQLException ex){
         throw new RuntimeException(ex);
@@ -1394,6 +1481,8 @@ public class App extends JFrame implements ActionListener, KeyListener {
         preparedStatement.setString(3, (String) table.getValueAt(table.getSelectedRow(), 2));
         preparedStatement.executeUpdate();
         table.setValueAt("Beklemede", table.getSelectedRow(), 3);
+
+        preparedStatement.close();
       }
       catch (SQLException ex){
         throw new RuntimeException(ex);
@@ -1407,6 +1496,7 @@ public class App extends JFrame implements ActionListener, KeyListener {
         preparedStatement.setString(3, (String)table.getValueAt(table.getSelectedRow(), 2));
         preparedStatement.executeUpdate();
         table.setValueAt("Talep Yok", table.getSelectedRow(), 3);
+        preparedStatement.close();
       }
       catch (SQLException ex){
         throw new RuntimeException(ex);
@@ -1426,30 +1516,44 @@ public class App extends JFrame implements ActionListener, KeyListener {
           PDDocument pdfDDocument = Loader.loadPDF(file);
           PDFTextStripper pdfTextStripper = new PDFTextStripper();
           String docText = pdfTextStripper.getText(pdfDDocument);
-          //System.out.println(docText);
 
-          //String regexPattern = "([A-Z]{3}[0-9]{3})\s(.*?)\s\(.*?\)\nZ\sTr\s[0-9]\s[0-9]\s[0-9]\s[0-9]\s[0-9A-Z]{3}\s\s";
-          String regexPattern = "[A-Z]{3}[0-9]{3}\\s.*\\r\\n|[\\r\\n]\\(.+\\)[\\r\\n]\\d+ Tr \\d{4} \\d{2}[A-Z]{2} [A-Z]";
+          String regexPattern = "[A-Z]{3}[0-9]{3}\\s(.*)\\R\\(.+\\)\\R[A-Z]+\\sTr\\s(\\d\\s){4}\\d{1,2}(\\.\\d{1,2})?([A-Z]{2})\\s\\s[A-Z]";
           Pattern pattern = Pattern.compile(regexPattern);
           Matcher matcher = pattern.matcher(docText);
 
-          List<String> matches = new ArrayList<>();
-
           while (matcher.find()) {
-            String match = matcher.group();
-            matches.add(match);
-          }
+            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO notlar(ogrenci_no, ders, harf_notu) VALUES (?, ?, ?)");
+            preparedStatement.setInt(1, ogrenci.no);
+            preparedStatement.setString(2, matcher.group(1));
+            preparedStatement.setString(3, matcher.group(4));
+            preparedStatement.executeUpdate();
 
-          for (String match : matches) {
-            System.out.println(match);
+            preparedStatement.close();
           }
+          OgrenciIlgiAlaniGoruntule();
 
           pdfDDocument.close();
-        } catch (IOException ex) {
+        } catch (IOException | SQLException ex) {
           throw new RuntimeException(ex);
         }
       } else {
         System.out.println("Dosya seçilmedi.");
+      }
+    }
+    if(e.getSource() == ogrenciNotlariGoruntuleButonu){
+      OgrenciNotlariGoruntule();
+    }
+    if(e.getSource() == ogrenciNotlariSilButonu){
+      try{
+        PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM notlar WHERE ogrenci_no = ?");
+        preparedStatement.setInt(1, ogrenci.no);
+        preparedStatement.executeUpdate();
+        preparedStatement.close();
+
+        OgrenciIlgiAlaniGoruntule();
+      }
+      catch (SQLException ex){
+        throw new RuntimeException(ex);
       }
     }
   }
