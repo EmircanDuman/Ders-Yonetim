@@ -18,8 +18,6 @@ import java.util.regex.Pattern;
 
 public class App extends JFrame implements ActionListener, KeyListener {
 
-  //OGRENCİ NOT GORUNTULE EKRANI, STATEMENTLAR VE RESULTSETLER KAPAT
-
   //---------------------------------------------UI BİLEŞENLERİ TANIMLAMA ALANI
 
   static String connectionURL = "jdbc:postgresql://localhost:5432/yazlab1?user=postgres&password=0000";
